@@ -1,0 +1,11 @@
+review_id,review_text,rating,review_date,client_id,dish_id
+1,Delicious and well-prepared!,5,2023-10-02T13:00:00.000,1,1
+2,A bit too spicy for my taste.,3,2023-10-03T15:00:00.000,2,2
+3,Perfectly cooked and flavorful.,5,2023-10-04T17:00:00.000,3,3
+4,Fresh and tasty sushi!,4,2023-10-05T19:00:00.000,4,4
+5,The pizza was a bit undercooked.,2,2023-10-06T21:00:00.000,5,5
+6,"Great salad, very fresh.",4,2023-10-07T11:00:00.000,6,6
+7,The bisque was too salty.,3,2023-10-08T13:00:00.000,7,7
+8,"Excellent stir fry, very healthy.",5,2023-10-09T15:00:00.000,8,8
+9,The mousse was too sweet.,2,2023-10-10T17:00:00.000,9,9
+10,Perfect crème brûlée!,5,2023-10-11T19:00:00.000,10,10

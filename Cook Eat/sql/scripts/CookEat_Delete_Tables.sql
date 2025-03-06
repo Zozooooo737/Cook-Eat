@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS is_favorite;
+DROP TABLE IF EXISTS is_made_up_of;
+DROP TABLE IF EXISTS client_order;
+DROP TABLE IF EXISTS business;
+DROP TABLE IF EXISTS ingredient;
+DROP TABLE IF EXISTS dish_review;
+DROP TABLE IF EXISTS dish_preparation;
+DROP TABLE IF EXISTS client_transaction;
+DROP TABLE IF EXISTS dish;
+DROP TABLE IF EXISTS address;
+DROP TABLE IF EXISTS cook;
+DROP TABLE IF EXISTS client;
+DROP TABLE IF EXISTS user_account;

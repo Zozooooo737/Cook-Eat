@@ -1,0 +1,21 @@
+address_id,street_number,street_address,city,postcode,nearest_metro_station,user_id
+1,12,Rue de la Paix,Paris,75001,Concorde,1
+2,45,Avenue des Champs-Élysées,Paris,75008,Champs-Élysées - Clemenceau,2
+3,78,Boulevard Saint-Germain,Paris,75006,Saint-Germain-des-Prés,3
+4,23,Rue de Rivoli,Paris,75004,Louvre - Rivoli,4
+5,56,Rue du Faubourg Saint-Honoré,Paris,75008,Madeleine,5
+6,89,Rue de Vaugirard,Paris,75015,Vaugirard,6
+7,34,Rue de Rennes,Paris,75006,Rennes,7
+8,67,Avenue de la République,Paris,75011,République,8
+9,90,Rue de la Roquette,Paris,75011,Bastille,9
+10,11,Rue de Charonne,Paris,75011,Charonne,10
+11,22,Rue de la Pompe,Paris,75016,La Muette,1
+12,33,Rue de Passy,Paris,75016,Passy,2
+13,44,Rue de la Faisanderie,Paris,75016,Porte Dauphine,3
+14,55,Rue de la Tour,Paris,75016,Trocadéro,4
+15,66,Rue de l'Université,Paris,75007,Invalides,5
+16,77,Rue de Grenelle,Paris,75007,Rue du Bac,6
+17,88,Rue de Sèvres,Paris,75007,Duroc,7
+18,99,Rue de Babylone,Paris,75007,Sèvres - Babylone,8
+19,10,Rue de Varenne,Paris,75007,Varenne,9
+20,20,Rue de Montalembert,Paris,75007,Rue du Bac,10
