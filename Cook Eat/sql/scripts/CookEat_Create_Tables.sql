@@ -1,3 +1,5 @@
+CREATE SCHEMA `cook-eat` ;
+
 CREATE TABLE user_account(
    user_id INT AUTO_INCREMENT,
    first_name VARCHAR(50) NOT NULL,
