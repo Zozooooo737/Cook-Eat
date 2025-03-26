@@ -5,16 +5,16 @@ namespace Cook_Eat
 {
     internal class Program
     {
+        public static DatabaseService DatabaseService = new DatabaseService();
+        public static UserService UserService = new UserService(DatabaseService);
+        public static DishService DishService = new DishService(DatabaseService);
+
         static void Main(string[] args)
         {
-            var databaseService = new DatabaseService();
-            var userService = new UserService(databaseService);
-            var userView = new UserView(userService);
-            var dishService = new DishService(databaseService);
-            var dishView = new DishView(dishService);
+            Console.Title = "Cook-Eat - Livraison de repas entre voisins";
+            Console.ForegroundColor = ConsoleColor.White;
 
-            userView.CreateUser();
-            dishView.DisplayAvailableDishes();
+            MainModule.Show();
         }
     }
 }

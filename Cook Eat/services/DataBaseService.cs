@@ -6,16 +6,27 @@ namespace Cook_Eat.services
     {
         private string _connectionString = "SERVER=localhost;PORT=3306;database=cook-eat;UID=root;PASSWORD=root";
 
-        public void ExecuteNonQuery(string query, MySqlParameter[] parameters = null)
+        public bool ExecuteNonQuery(string query, MySqlParameter[] parameters = null)
         {
-            using (MySqlConnection connection = new MySqlConnection(_connectionString))
+            try
             {
-                connection.Open();
-                using (MySqlCommand command = new MySqlCommand(query, connection))
+                using (MySqlConnection connection = new MySqlConnection(_connectionString))
                 {
-                    command.Parameters.AddRange(parameters);
-                    command.ExecuteNonQuery();
+                    connection.Open();
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        if (parameters != null)
+                        {
+                            command.Parameters.AddRange(parameters);
+                        }
+                        command.ExecuteNonQuery();
+                        return true;
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 
