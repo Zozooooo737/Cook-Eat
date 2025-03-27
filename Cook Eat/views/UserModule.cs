@@ -20,7 +20,7 @@ namespace Cook_Eat.views
             while (true)
             {
                 Console.Clear();
-                int choice = ConsoleView.ShowMenu("=== MODULE UTILISATEURS ===", menuOptions);
+                int choice = ConsoleView.ShowMenu("MODULE UTILISATEURS", menuOptions);
 
                 Console.Clear();
                 switch (choice)
@@ -40,6 +40,7 @@ namespace Cook_Eat.views
                     case 4:
                         return;
                 }
+                ConsoleView.WaitForContinue();
             }
         }
     }

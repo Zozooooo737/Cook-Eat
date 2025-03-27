@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Cook_Eat.views
+﻿namespace Cook_Eat.views
 {
     public static class MainModule
     {
@@ -8,6 +6,7 @@ namespace Cook_Eat.views
         {
             string[] mainMenuOptions = {
                 "Module Utilisateurs",
+                "Module Clients",
                 "Module Plats",
                 "Module Commandes",
                 "Module Statistiques",
@@ -17,8 +16,6 @@ namespace Cook_Eat.views
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=== COOK-EAT - LIVRAISON DE REPAS ENT VOISINS ===");
-                Console.WriteLine();
 
                 int choice = ConsoleView.ShowMenu("MENU PRINCIPAL", mainMenuOptions);
 
@@ -28,7 +25,7 @@ namespace Cook_Eat.views
                         UserModule.Show();
                         break;
                     case 1:
-                        // DishModule.Show();
+                        ClientModule.Show();
                         break;
                     case 2:
                         // OrderModule.Show();
@@ -36,8 +33,8 @@ namespace Cook_Eat.views
                     case 3:
                         // StatsModule.Show();
                         break;
-                    case 4:
-                        Console.WriteLine("\nMerci d'avoir utilisé Cook-Eat. À bientôt !");
+                    case 5:
+                        Console.WriteLine("\nMerci d'avoir utilisé Cook'Eat. À bientôt !");
                         return;
                 }
             }

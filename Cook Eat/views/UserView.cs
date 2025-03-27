@@ -49,7 +49,7 @@ namespace Cook_Eat.views
 
             while (true)
             {
-                int choice = ConsoleView.ShowMenu("=== AFFICHAGE UTILISATEURS ===", menuOptions);
+                int choice = ConsoleView.ShowMenu("AFFICHAGE UTILISATEURS", menuOptions);
 
                 List<Dictionary<string, object>> data;
                 string title;
@@ -90,11 +90,8 @@ namespace Cook_Eat.views
                         continue;
                 }
 
-                Console.Clear();
-                Console.WriteLine($"=== {title} ===");
-                ConsoleView.DisplayTable(data);
-                Console.ReadKey(true);
-                Console.Clear();
+                ConsoleView.DisplayDataWithChoice(data, title);
+                ConsoleView.WaitForContinue();
             }
         }
 

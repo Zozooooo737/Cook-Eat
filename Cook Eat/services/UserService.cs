@@ -1,6 +1,5 @@
 ﻿using Cook_Eat.models;
 using MySql.Data.MySqlClient;
-using System.Reflection.PortableExecutable;
 
 namespace Cook_Eat.services
 {
@@ -29,26 +28,13 @@ namespace Cook_Eat.services
             _databaseService.ExecuteNonQuery(query, parameters);
         }
 
-        public List<Dictionary<string, object>> GetAllUsersForDisplay()
-        {
-            string query = @"SELECT 
-                        user_id as 'ID',
-                        CONCAT(first_name, ' ', last_name) as 'Nom complet',
-                        COALESCE(phone_number, 'Non renseigné') as 'Téléphone',
-                        email as 'Email',
-                        CASE WHEN is_business THEN 'Entreprise' ELSE 'Particulier' END as 'Type'
-                    FROM user_account";
-
-            return _databaseService.ExecuteQuery(query);
-        }
-
-        // Méthode générique de base
         public List<Dictionary<string, object>> GetUsersSorted(string orderBy = "last_name", bool ascending = true)
         {
             string direction = ascending ? "ASC" : "DESC";
             string query = $@"SELECT 
                         user_id as 'ID',
-                        CONCAT(first_name, ' ', last_name) as 'Nom',
+                        first_name as 'Prénom',
+                        last_name as 'Nom',
                         email as 'Email',
                         phone_number as 'Numéro',
                         CASE WHEN is_business THEN 'Entreprise' ELSE 'Particulier' END as 'Type'
@@ -58,12 +44,12 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteQuery(query);
         }
 
-        // Méthodes spéciales (exemples)
         public List<Dictionary<string, object>> GetUsersByAddress()
         {
             string query = @"SELECT 
                         u.user_id as 'ID',
-                        CONCAT(u.first_name, ' ', u.last_name) as 'Nom',
+                        first_name as 'Prénom',
+                        last_name as 'Nom',
                         COALESCE(a.street_address, 'Non renseigné') as 'Adresse'
                       FROM user_account u
                       LEFT JOIN address a ON u.user_id = a.user_id
@@ -76,9 +62,7 @@ namespace Cook_Eat.services
         {
             string query = "SELECT * FROM user_account WHERE user_id = @UserId";
 
-            MySqlParameter[] parameters = {
-                new MySqlParameter("@UserId", userId)
-            };
+            MySqlParameter[] parameters = { new MySqlParameter("@UserId", userId) };
 
             var data = _databaseService.ExecuteQuery(query, parameters);
 
@@ -122,24 +106,12 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteNonQuery(query, parameters);
         }
 
-        // On renvoit true mais le user n'existait pas, améliorer ?
         public bool DeleteUser(int userId)
         {
-            try
-            {
-                string query = "DELETE FROM user_account WHERE user_id = @UserId;";
+            string query = "DELETE FROM user_account WHERE user_id = @UserId;";
+            MySqlParameter[] parameters = { new MySqlParameter("@UserId", userId) };
 
-                MySqlParameter[] parameters = {
-                    new MySqlParameter("@UserId", userId)
-                };
-
-                _databaseService.ExecuteNonQuery(query, parameters);
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return _databaseService.ExecuteNonQuery(query, parameters); ;
         }
 
     }
