@@ -1,4 +1,4 @@
-CREATE SCHEMA `cook-eat` ;
+-- CREATE SCHEMA `cook-eat` ;
 
 CREATE TABLE user_account(
    user_id INT AUTO_INCREMENT,

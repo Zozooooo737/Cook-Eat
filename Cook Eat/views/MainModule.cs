@@ -7,7 +7,7 @@
             string[] mainMenuOptions = {
                 "Module Utilisateurs",
                 "Module Clients",
-                "Module Plats",
+                "Module Cuisiniers",
                 "Module Commandes",
                 "Module Statistiques",
                 "Quitter l'application"
@@ -28,7 +28,7 @@
                         ClientModule.Show();
                         break;
                     case 2:
-                        // OrderModule.Show();
+                        CookModule.Show();
                         break;
                     case 3:
                         // StatsModule.Show();

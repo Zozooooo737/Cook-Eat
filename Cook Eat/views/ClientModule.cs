@@ -12,7 +12,7 @@ namespace Cook_Eat.views
             string[] menuOptions = {
                 "Créer un compte client",
                 "Afficher les clients",
-                "Modifier un client",
+                "Modifier un compte client",
                 "Supprimer un compte client",
                 "Retour au menu principal"
             };
@@ -42,9 +42,7 @@ namespace Cook_Eat.views
                     case 4:
                         return;
                 }
-
-                Console.WriteLine("\nAppuyez sur une touche pour continuer...");
-                Console.ReadKey();
+                ConsoleView.WaitForContinue();
             }
         }
     }

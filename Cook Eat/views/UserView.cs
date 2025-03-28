@@ -16,6 +16,7 @@ namespace Cook_Eat.views
         {
             string firstName = ConsoleView.GetUserInput("Entrez votre prénom : ");
             string lastName = ConsoleView.GetUserInput("Entrez votre nom : ");
+            string phoneNumber = ConsoleView.GetUserInput("Entrez votre numéro de téléphone : ");
             string email = ConsoleView.GetUserInput("Entrez votre email : ");
             string password = ConsoleView.GetUserInput("Entrez votre mot de passe : ");
             bool isBusiness = ConsoleView.GetUserInput("Êtes-vous une entreprise ? (Oui/Non) : ").ToLower() == "oui";
@@ -24,6 +25,7 @@ namespace Cook_Eat.views
             {
                 FirstName = firstName,
                 LastName = lastName,
+                PhoneNumber = phoneNumber,
                 Email = email,
                 Password = password,
                 IsBusiness = isBusiness
@@ -89,7 +91,6 @@ namespace Cook_Eat.views
                     default:
                         continue;
                 }
-
                 ConsoleView.DisplayDataWithChoice(data, title);
                 ConsoleView.WaitForContinue();
             }

@@ -5,7 +5,7 @@ namespace Cook_Eat.services
 {
     public class UserService
     {
-        private DatabaseService _databaseService;
+        private readonly DatabaseService _databaseService;
 
         public UserService(DatabaseService databaseService)
         {
@@ -14,12 +14,13 @@ namespace Cook_Eat.services
 
         public void CreateUser(UserAccount user)
         {
-            string query = "INSERT INTO user_account (first_name, last_name, email, password, is_business) " +
-                           "VALUES (@FirstName, @LastName, @Email, @Password, @IsBusiness);";
+            string query = @"INSERT INTO user_account (first_name, last_name, phone_number, email, password, is_business) 
+                             VALUES (@FirstName, @LastName, @PhoneNumber, @Email, @Password, @IsBusiness);";
 
             MySqlParameter[] parameters = {
             new MySqlParameter("@FirstName", user.FirstName),
             new MySqlParameter("@LastName", user.LastName),
+            new MySqlParameter("@PhoneNumber", user.PhoneNumber),
             new MySqlParameter("@Email", user.Email),
             new MySqlParameter("@Password", user.Password),
             new MySqlParameter("@IsBusiness", user.IsBusiness)
@@ -77,7 +78,8 @@ namespace Cook_Eat.services
             {
                 UserId = Convert.ToInt32(userData["user_id"]),
                 FirstName = Convert.ToString(userData["first_name"]),
-                LastName = Convert.ToString(userData["last_name"]),
+                PhoneNumber = Convert.ToString(userData["phone_number"]),
+                LastName = Convert.ToString(userData["last_name"]), 
                 Email = Convert.ToString(userData["email"]),
                 Password = Convert.ToString(userData["password"]),
                 IsBusiness = Convert.ToBoolean(userData["is_business"])
@@ -88,7 +90,8 @@ namespace Cook_Eat.services
         {
             string query = @"UPDATE user_account 
                     SET first_name = @FirstName, 
-                        last_name = @LastName, 
+                        last_name = @LastName,
+                        phone_number = @PhoneNumber,
                         email = @Email, 
                         password = @Password, 
                         is_business = @IsBusiness 
@@ -97,6 +100,7 @@ namespace Cook_Eat.services
             MySqlParameter[] parameters = {
                 new MySqlParameter("@FirstName", user.FirstName),
                 new MySqlParameter("@LastName", user.LastName),
+                new MySqlParameter("@PhoneNumber", user.PhoneNumber),
                 new MySqlParameter("@Email", user.Email),
                 new MySqlParameter("@Password", user.Password),
                 new MySqlParameter("@IsBusiness", user.IsBusiness),

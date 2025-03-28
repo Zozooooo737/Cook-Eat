@@ -1,6 +1,5 @@
 ﻿using Cook_Eat.models;
 using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 
 namespace Cook_Eat.services
 {
@@ -15,9 +14,8 @@ namespace Cook_Eat.services
 
         public bool CreateClient(Client client)
         {
-            string query = @"
-                INSERT INTO client (client_username, user_id)
-                VALUES (@Username, @UserId)";
+            string query = @"INSERT INTO client (client_username, user_id) 
+                             VALUES (@Username, @UserId)";
 
             MySqlParameter[] parameters = {
                 new MySqlParameter("@Username", client.ClientUsername),

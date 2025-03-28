@@ -57,7 +57,7 @@ namespace Cook_Eat.views
             while (true)
             {
                 Console.Clear();
-                int choice = ConsoleView.ShowMenu("=== AFFICHAGE CLIENTS ===", menuOptions);
+                int choice = ConsoleView.ShowMenu("AFFICHAGE CLIENTS", menuOptions);
 
                 List<Dictionary<string, object>> data;
                 string title;
@@ -101,7 +101,6 @@ namespace Cook_Eat.views
                     default:
                         continue;
                 }
-
                 ConsoleView.DisplayDataWithChoice(data, title);
                 ConsoleView.WaitForContinue();
             }
@@ -137,7 +136,7 @@ namespace Cook_Eat.views
 
                 if (_clientService.DeleteClient(clientId))
                 {
-                    ConsoleView.DisplayMessage("Compte client supprimé (le compte utilisateur reste actif).");
+                    ConsoleView.DisplayMessage("Compte client supprimé.");
                 }
                 else
                 {

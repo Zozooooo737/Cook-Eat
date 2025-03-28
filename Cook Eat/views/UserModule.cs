@@ -4,8 +4,8 @@ namespace Cook_Eat.views
 {
     public static class UserModule
     {
-        private static UserService _userService = Program.UserService;
-        private static UserView _userView = new UserView(_userService);
+        private static readonly UserService _userService = Program.UserService;
+        private static readonly UserView _userView = new UserView(_userService);
 
         public static void Show()
         {
