@@ -1,4 +1,5 @@
 ﻿using System.Xml.Linq;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace Cook_Eat
 {
@@ -329,51 +330,6 @@ namespace Cook_Eat
 
 
         /// <summary>
-        /// Retourne une description textuelle du graphe.
-        /// Inclut des informations sur l'orientation, la pondération, l'ordre, la taille,
-        /// la connexité, la présence de cycles, ainsi que les parcours DFS et BFS.
-        /// </summary>
-        /// <returns>Une chaîne de caractères décrivant le graphe.</returns>
-        public override string ToString()
-        {
-            string description = "Descritption générale du graphe :\n";
-
-            description += "\nOrienté : " + isDirected;
-            description += "\nPondéré : " + isWeighted;
-            description += "\nNombre de nœuds (Ordre) : " + GetOrder();
-            description += "\nNombre de liens (Taille) : " + GetSize();
-            description += "\nLe graphe est-il connexe ? " + IsConnected();
-            description += "\nLe graphe contient-il un cycle ? " + ContainsCycle();
-
-            description += "\n\nParcours en profondeur (DFS) à partir du nœud 1 : " +
-                           string.Join(", ", DepthFirstSearch(1).Select(node => node.Id));
-
-            description += "\nParcours en largeur (BFS) à partir du nœud 1 : " +
-                           string.Join(", ", BreadthFirstSearch(1).Select(node => node.Id));
-
-            description += "\n\nNodes:";
-            foreach (Node<T> node in Nodes)
-            {
-                description += "\n  - Node " + node.Id;
-            }
-
-            description += "\n\nLinks:";
-            foreach (var link in Links)
-            {
-                if (isWeighted)
-                {
-                    description += $"\n  - {link.StartNode.Id} {(isDirected ? "->" : "<->")} {link.EndNode.Id} (Weight: {link.Weight})";
-                }
-                else
-                {
-                    description += $"\n  - {link.StartNode.Id} {(isDirected ? "->" : "<->")} {link.EndNode.Id}";
-                }
-            }
-            return description;
-        }
-
-
-        /// <summary>
         /// Méthode de parcours de graphe utilisant l'algorithme de Dijkstra.
         /// Utilise deux listes, une pour conserver les plus courtes distances entre deux noeuds avec le
         /// prédécesseur du point d'arrivée et une autre pour savoir quels noeuds ont été visités ou non.
@@ -484,6 +440,140 @@ namespace Cook_Eat
                 }
             }
             return (path, dist[target.Id - 1].Item1);
+        }
+
+
+        /// <summary>
+        /// Méthode de parcours de graphe utilisant l'algorithme de Floyd-Warshall.
+        /// Utilise une matrice pour conserver les plus courtes distances entre 
+        /// tous les noeuds avec le point par lequel on doit passer.
+        /// </summary>
+        /// <returns>La matrice des distances les plus courtes entre chaque noeud
+        /// avec, pour indication, le noeud par lequel on passe.</returns>
+        public (double, int)[,] FloydWarshall()
+        {
+            (double, int)[,] dist = new (double, int)[Nodes.Count, Nodes.Count];
+            for (int i = 0; i < Nodes.Count; i++)
+            {
+                for (int j = 0; j < Nodes.Count; j++)
+                {
+                    if (i == j) { dist[i, j] = (0, -1); }
+                    else { dist[i, j] = (double.MaxValue, -1); }
+                }
+            }
+            foreach (Link<T> link in Links)
+            {
+                dist[link.StartNode.Id - 1, link.EndNode.Id - 1] = (link.Weight, link.StartNode.Id - 1);
+            }
+
+            for (int k = 0; k < Nodes.Count; k++)
+            {
+                for (int i = 0; i < Nodes.Count; i++)
+                {
+                    for (int j = 0; j < Nodes.Count; j++)
+                    {
+                        if (dist[i, k].Item1 < double.MaxValue && dist[k, j].Item1 < double.MaxValue && dist[i, j].Item1 > dist[i, k].Item1 + dist[k, j].Item1)
+                        {
+                            dist[i, j] = (dist[i, k].Item1 + dist[k, j].Item1, k);
+                        }
+                    }
+                }
+            }
+
+            return dist;
+        }
+
+
+        /// <summary>
+        /// Méthode permettant d'obtenir le plus court chemin entre deux noeuds à partir de l'algorithme de Floyd-Warshall.
+        /// Utilise la méthode récursive FloydPathRec pour reconstruire ce chemin.
+        /// </summary>
+        /// <param name="source">Le noeud depuis lequel on souhaite partir.</param>
+        /// <param name="target">Le noeud vers lequel on souhaite aller.</param>
+        /// <returns>Un tuple avec une liste contenant les Ids des noeuds permettant le plus court 
+        /// chemin de source vers target ainsi que le poids total de ce chemin.
+        /// OU retourne un tuple avec null et 0 si le chemin n'existe pas.</returns>
+        public (List<int>, double) ShortestPathFloyd(Node<T> source, Node<T> target)
+        {
+            (double, int)[,] dist = FloydWarshall();
+
+            if (dist[source.Id - 1, target.Id - 1].Item1 == double.MaxValue) { return (null, 0); }
+
+            List<int> path = [];
+            FloydPathRec(source.Id - 1, target.Id - 1, dist, path);
+            return (path, dist[source.Id - 1, target.Id - 1].Item1);
+        }
+
+
+        /// <summary>
+        /// Méthode récursive utilisant toutes les valeurs de la matrice de Floyd 
+        /// pour reconstruire le chemin optimal entre deux noeuds choisis.
+        /// A chaque appel, elle regarde le chemin possible entre les deux noeuds représentés en paramètres 
+        /// en le décomposant en deux parties grâce au noeud indiqué dans la matrice de Floyd.
+        /// </summary>
+        /// <param name="i">L'indice représentant le noeud de départ courant.</param>
+        /// <param name="j">L'indice représentant le noeud d'arrivée courant.</param>
+        /// <param name="dist">La matrice de Floyd du graphe.</param>
+        /// <param name="path">Le chemin voulu, rempli au fur et à mesure.</param>
+        public void FloydPathRec(int i, int j, (double, int)[,] dist, List<int> path)
+        {
+            int k = dist[i, j].Item2;
+            if (k == -1)
+            {
+                if (path.Count == 0 || path[path.Count - 1] != i) { path.Add(i); }
+                if (i != j) { path.Add(j); }
+            }
+            else
+            {
+                FloydPathRec(i, k, dist, path);
+                path.RemoveAt(path.Count - 1);
+                FloydPathRec(k, j, dist, path);
+            }
+        }
+
+
+        /// <summary>
+        /// Retourne une description textuelle du graphe.
+        /// Inclut des informations sur l'orientation, la pondération, l'ordre, la taille,
+        /// la connexité, la présence de cycles, ainsi que les parcours DFS et BFS.
+        /// </summary>
+        /// <returns>Une chaîne de caractères décrivant le graphe.</returns>
+        public override string ToString()
+        {
+            string description = "Descritption générale du graphe :\n";
+
+            description += "\nOrienté : " + isDirected;
+            description += "\nPondéré : " + isWeighted;
+            description += "\nNombre de nœuds (Ordre) : " + GetOrder();
+            description += "\nNombre de liens (Taille) : " + GetSize();
+            description += "\nLe graphe est-il connexe ? " + IsConnected();
+            description += "\nLe graphe contient-il un cycle ? " + ContainsCycle();
+
+            description += "\n\nParcours en profondeur (DFS) à partir du nœud 1 : " +
+                           string.Join(", ", DepthFirstSearch(1).Select(node => node.Id));
+
+            description += "\nParcours en largeur (BFS) à partir du nœud 1 : " +
+                           string.Join(", ", BreadthFirstSearch(1).Select(node => node.Id));
+
+            description += "\n\nNodes:";
+            foreach (Node<T> node in Nodes)
+            {
+                description += "\n  - Node " + node.Id;
+            }
+
+            description += "\n\nLinks:";
+            foreach (var link in Links)
+            {
+                if (isWeighted)
+                {
+                    description += $"\n  - {link.StartNode.Id} {(isDirected ? "->" : "<->")} {link.EndNode.Id} (Weight: {link.Weight})";
+                }
+                else
+                {
+                    description += $"\n  - {link.StartNode.Id} {(isDirected ? "->" : "<->")} {link.EndNode.Id}";
+                }
+            }
+            return description;
         }
     }
 }
