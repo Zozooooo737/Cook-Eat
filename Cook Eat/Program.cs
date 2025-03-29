@@ -11,10 +11,12 @@ namespace Cook_Eat
 
         static void Main(string[] args)
         {
-            Console.Title = "Cook-Eat - Livraison de repas entre voisins";
+            /*Console.Title = "Cook-Eat - Livraison de repas entre voisins";
             Console.ForegroundColor = ConsoleColor.White;
 
-            MainModule.Show();
+            MainModule.Show();*/
+
+            Tools.TransportNetwork();
         }
     }
 }

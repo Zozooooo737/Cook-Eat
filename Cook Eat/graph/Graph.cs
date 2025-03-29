@@ -83,11 +83,11 @@ namespace Cook_Eat
         public void AddLink(int sourceId, int targetId, double weight = 1.0)
         {
             // Recherche ou création du nœud source
-            Node<T> source = Nodes.FirstOrDefault(n => n.Id == sourceId) ?? new Node<T>(sourceId);
+            Node<T> source = Nodes.FirstOrDefault(n => n.Id == sourceId) ?? new Node<T>(sourceId, null, null);
             if (!Nodes.Contains(source)) Nodes.Add(source);
 
             // Recherche ou création du nœud cible
-            Node<T> target = Nodes.FirstOrDefault(n => n.Id == targetId) ?? new Node<T>(targetId);
+            Node<T> target = Nodes.FirstOrDefault(n => n.Id == targetId) ?? new Node<T>(targetId, null, null);
             if (!Nodes.Contains(target)) Nodes.Add(target);
 
             // Vérifie si le lien existe déjà pour éviter les doublons

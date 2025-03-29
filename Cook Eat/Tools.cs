@@ -5,28 +5,21 @@ namespace Cook_Eat
 {
     public class Tools
     {
-        static void Main(string[] args)
-        {
-            TransportNetwork();
-        }
-
-
-
         // <summary>
         /// Méthode pour la création du réseau de métros.
         /// </summary>
-        static void TransportNetwork()
+        public static void TransportNetwork()
         {
             Graph g = new Graph(isDirected: true, isWeighted: true);
             Dictionary<int, (double, double)> pos = ReadFileToHaveNodesPosition("../../../data/pos.txt");
-            List<Node> nodes = ReadFileToCreateDetailedNodes("../../../data/stations.txt");
+            List<Node<int>> nodes = ReadFileToCreateDetailedNodes("../../../data/stations.txt");
             g.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", pos, nodes), nodes);
 
             Console.WriteLine("Réseau des métros de Paris :\n");
 
             Console.WriteLine(g.ToString());
 
-            GraphVisualizer visualizer = new GraphVisualizer(g, false);
+            GraphVisualizer<int> visualizer = new GraphVisualizer<int>(g, false);
             visualizer.Visualize("stations.png");
         }
 
@@ -38,10 +31,10 @@ namespace Cook_Eat
         /// </summary>
         /// <param name="path">Chemin du fichier contenant les données.</param>
         /// <returns>Une liste contenant l'ensemble des noeuds créés.</returns>
-        private static List<Node> ReadFileToCreateDetailedNodes(string path)
+        private static List<Node<int>> ReadFileToCreateDetailedNodes(string path)
         {
             string[] lines = File.ReadAllLines(path);
-            List<Node> nodes = [];
+            List<Node<int>> nodes = [];
 
             for (int i = 0; i < lines.Length; i++)
             {
@@ -49,7 +42,7 @@ namespace Cook_Eat
                 int id = int.Parse(parts[0]);
                 string group = parts[1];
                 string description = parts[2];
-                Node tmp = new Node(id, group, description);
+                Node<int> tmp = new Node<int>(id, group, description);
                 nodes.Add(tmp);
             }
             return nodes;
@@ -89,7 +82,7 @@ namespace Cook_Eat
         /// <param name="pos">Dictionnaire des positions des stations.</param>
         /// <param name="nodes">Liste de toutes les noeuds représentant les stations.</param>
         /// <returns></returns>
-        private static int[,] ReadFileForNetworkAdjacencyMatrix(string path, Dictionary<int,(double,double)> pos, List<Node> nodes)
+        private static int[,] ReadFileForNetworkAdjacencyMatrix(string path, Dictionary<int,(double,double)> pos, List<Node<int>> nodes)
         {
             string[] lines = File.ReadAllLines(path);
 
@@ -114,11 +107,11 @@ namespace Cook_Eat
                 double dist;
                 int time;
 
-                Node idN = null;
-                Node leftN = null;
-                Node rightN = null;
+                Node<int> idN = null;
+                Node<int> leftN = null;
+                Node<int> rightN = null;
                 
-                foreach(Node element in nodes)
+                foreach(Node<int> element in nodes)
                 {
                     if (element.Id == id) { idN = element; }
                     if (element.Id == left) { leftN = element; }
@@ -135,7 +128,7 @@ namespace Cook_Eat
                         difLong = (targetLong - sourceLong) * Math.PI / 180;
                         difLat = (targetLat - sourceLat) * Math.PI / 180;
                         dist = 2 * 6371 * Math.Asin(Math.Sqrt(Math.Sin(difLat / 2) * Math.Sin(difLat / 2) + Math.Cos(sourceLat * Math.PI / 180) *
-                        Math.Cos(targetLat * Math.PI / 180) * Math.Sin((difLong * Math.PI / 180) / 2) * Math.Sin((difLong * Math.PI / 180) / 2)));
+                        Math.Cos(targetLat * Math.PI / 180) * Math.Sin(difLong / 2) * Math.Sin(difLong / 2)));
                         time = Convert.ToInt32(dist * 60 / 30);
                         adjacencyMatrix[id - 1, left - 1] = time;
                     }
@@ -148,10 +141,10 @@ namespace Cook_Eat
                     {
                         targetLong = pos[right].Item1;
                         targetLat = pos[right].Item2;
-                        difLong = (targetLong - sourceLong*180/Math.PI) * Math.PI / 180;
-                        difLat = (targetLat - sourceLat*180/Math.PI) * Math.PI / 180;
-                        dist = 2 * 6371 * Math.Asin(Math.Sqrt(Math.Sin(difLat / 2) * Math.Sin(difLat / 2) + 
-                        Math.Cos(sourceLat) * Math.Cos(targetLat*Math.PI/180) * Math.Sin(difLong / 2) * Math.Sin(difLong / 2)));
+                        difLong = (targetLong - sourceLong) * Math.PI / 180;
+                        difLat = (targetLat - sourceLat) * Math.PI / 180;
+                        dist = 2 * 6371 * Math.Asin(Math.Sqrt(Math.Sin(difLat / 2) * Math.Sin(difLat / 2) + Math.Cos(sourceLat * Math.PI / 180) *
+                        Math.Cos(targetLat * Math.PI / 180) * Math.Sin(difLong / 2) * Math.Sin(difLong / 2)));
                         time = Convert.ToInt32(dist * 60 / 30);
                         adjacencyMatrix[id - 1, right - 1] = time;
                     }
