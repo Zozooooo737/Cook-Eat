@@ -1,0 +1,330 @@
+1;Ligne 1;Porte Maillot
+2;Ligne 1;Argentine
+3;Ligne 1;Charles de Gaulle - Etoile
+4;Ligne 1;George V
+5;Ligne 1;Franklin D. Roosevelt
+6;Ligne 1;Champs-Elysées - Clemenceau
+7;Ligne 1;Concorde
+8;Ligne 1;Tuileries
+9;Ligne 1;Palais Royal - Musée du Louvre
+10;Ligne 1;Louvre - Rivoli
+11;Ligne 1;Châtelet
+12;Ligne 1;Hôtel de Ville
+13;Ligne 1;Saint-Paul (Le Marais)
+14;Ligne 1;Bastille
+15;Ligne 1;Gare de Lyon
+16;Ligne 1;Reuilly - Diderot
+17;Ligne 1;Nation
+18;Ligne 1;Porte de Vincennes
+19;Ligne 1;Château de Vincennes
+20;Ligne 2;Porte Dauphine
+21;Ligne 2;Victor Hugo
+22;Ligne 2;Charles de Gaulle - Etoile
+23;Ligne 2;Ternes
+24;Ligne 2;Courcelles
+25;Ligne 2;Monceau
+26;Ligne 2;Villiers
+27;Ligne 2;Rome
+28;Ligne 2;Place de Clichy
+29;Ligne 2;Blanche
+30;Ligne 2;Pigalle
+31;Ligne 2;Anvers
+32;Ligne 2;Barbès - Rochechouart
+33;Ligne 2;La Chapelle
+34;Ligne 2;Stalingrad
+35;Ligne 2;Jaurès
+36;Ligne 2;Colonel Fabien
+37;Ligne 2;Belleville
+38;Ligne 2;Couronnes
+39;Ligne 2;Ménilmontant
+40;Ligne 2;Père Lachaise
+41;Ligne 2;Philippe Auguste
+42;Ligne 2;Alexandre Dumas
+43;Ligne 2;Avron
+44;Ligne 2;Nation
+45;Ligne 3;Porte de Champerret
+46;Ligne 3;Pereire
+47;Ligne 3;Wagram
+48;Ligne 3;Malesherbes
+49;Ligne 3;Villiers
+50;Ligne 3;Europe
+51;Ligne 3;Saint-Lazare
+52;Ligne 3;Havre-Caumartin
+53;Ligne 3;Opéra
+54;Ligne 3;Quatre Septembre
+55;Ligne 3;Bourse
+56;Ligne 3;Sentier
+57;Ligne 3;Réaumur - Sébastopol
+58;Ligne 3;Arts et Métiers
+59;Ligne 3;Temple
+60;Ligne 3;République
+61;Ligne 3;Parmentier
+62;Ligne 3;Rue Saint-Maur
+63;Ligne 3;Père Lachaise
+64;Ligne 3;Gambetta
+65;Ligne 3;Porte de Bagnolet
+66;Ligne 3B;Porte des Lilas
+67;Ligne 3B;Saint-Fargeau
+68;Ligne 3B;Pelleport
+69;Ligne 3B;Gambetta
+70;Ligne 4;Porte de Clignancourt
+71;Ligne 4;Simplon
+72;Ligne 4;Marcadet - Poissonniers
+73;Ligne 4;Château Rouge
+74;Ligne 4;Barbès - Rochechouart
+75;Ligne 4;Gare du Nord
+76;Ligne 4;Gare de l'Est
+77;Ligne 4;Château d'Eau
+78;Ligne 4;Strasbourg - Saint-Denis
+79;Ligne 4;Réaumur - Sébastopol
+80;Ligne 4;Etienne Marcel
+81;Ligne 4;Les Halles
+82;Ligne 4;Châtelet
+83;Ligne 4;Cité
+84;Ligne 4;Saint-Michel
+85;Ligne 4;Odéon
+86;Ligne 4;Saint-Germain-des-Prés
+87;Ligne 4;Saint-Sulpice
+88;Ligne 4;Saint-Placide
+89;Ligne 4;Montparnasse Bienvenue
+90;Ligne 4;Vavin
+91;Ligne 4;Raspail
+92;Ligne 4;Denfert-Rochereau
+93;Ligne 4;Mouton-Duvernet
+94;Ligne 4;Alésia
+95;Ligne 4;Porte d'Orléans
+96;Ligne 5;Porte de Pantin
+97;Ligne 5;Ourcq
+98;Ligne 5;Laumière
+99;Ligne 5;Jaurès
+100;Ligne 5;Stalingrad
+101;Ligne 5;Gare du Nord
+102;Ligne 5;Gare de l'Est
+103;Ligne 5;Jacques Bonsergent
+104;Ligne 5;République
+105;Ligne 5;Oberkampf
+106;Ligne 5;Richard-Lenoir
+107;Ligne 5;Bréguet-Sabin
+108;Ligne 5;Bastille
+109;Ligne 5;Quai de la Rapée
+110;Ligne 5;Gare d'Austerlitz
+111;Ligne 5;Saint-Marcel
+112;Ligne 5;Campo-Formio
+113;Ligne 5;Place d'Italie
+114;Ligne 6;Charles de Gaulle - Etoile
+115;Ligne 6;Kléber
+116;Ligne 6;Boissière
+117;Ligne 6;Trocadéro
+118;Ligne 6;Passy
+119;Ligne 6;Bir-Hakeim
+120;Ligne 6;Dupleix
+121;Ligne 6;La Motte-Picquet - Grenelle
+122;Ligne 6;Cambronne
+123;Ligne 6;Sèvres-Lecourbe
+124;Ligne 6;Pasteur
+125;Ligne 6;Montparnasse Bienvenue
+126;Ligne 6;Edgar Quinet
+127;Ligne 6;Raspail
+128;Ligne 6;Denfert-Rochereau
+129;Ligne 6;Saint-Jacques
+130;Ligne 6;Glacière
+131;Ligne 6;Corvisart
+132;Ligne 6;Place d'Italie
+133;Ligne 6;Nationale
+134;Ligne 6;Chevaleret
+135;Ligne 6;Quai de la Gare
+136;Ligne 6;Bercy
+137;Ligne 6;Dugommier
+138;Ligne 6;Daumesnil
+139;Ligne 6;Bel-Air
+140;Ligne 6;Picpus
+141;Ligne 6;Nation
+142;Ligne 7;Porte de la Villette
+143;Ligne 7;Corentin Cariou
+144;Ligne 7;Crimée
+145;Ligne 7;Riquet
+146;Ligne 7;Stalingrad
+147;Ligne 7;Louis Blanc
+148;Ligne 7;Château Landon
+149;Ligne 7;Gare de l'Est
+150;Ligne 7;Poissonnière
+151;Ligne 7;Cadet
+152;Ligne 7;Le Peletier
+153;Ligne 7;Chaussée d'Antin - La Fayette
+154;Ligne 7;Opéra
+155;Ligne 7;Pyramides
+156;Ligne 7;Palais Royal - Musée du Louvre
+157;Ligne 7;Pont Neuf
+158;Ligne 7;Châtelet
+159;Ligne 7;Pont Marie (Cité des Arts)
+160;Ligne 7;Sully - Morland
+161;Ligne 7;Jussieu
+162;Ligne 7;Place Monge
+163;Ligne 7;Censier - Daubenton
+164;Ligne 7;Les Gobelins
+165;Ligne 7;Place d'Italie
+166;Ligne 7;Tolbiac
+167;Ligne 7;Maison Blanche
+168;Ligne 7;Porte d'Italie
+169;Ligne 7;Porte de Choisy
+170;Ligne 7;Porte d'Ivry
+171;Ligne 7B;Louis Blanc
+172;Ligne 7B;Jaurès
+173;Ligne 7B;Bolivar
+174;Ligne 7B;Buttes Chaumont
+175;Ligne 7B;Botzaris
+176;Ligne 7B;Place des Fêtes
+177;Ligne 7B;Pré-Saint-Gervais
+178;Ligne 7B;Danube
+179;Ligne 8;Balard
+180;Ligne 8;Lourmel
+181;Ligne 8;Boucicaut
+182;Ligne 8;Félix Faure
+183;Ligne 8;Commerce
+184;Ligne 8;La Motte-Picquet - Grenelle
+185;Ligne 8;Ecole Militaire
+186;Ligne 8;La Tour-Maubourg
+187;Ligne 8;Invalides
+188;Ligne 8;Concorde
+189;Ligne 8;Madeleine
+190;Ligne 8;Opéra
+191;Ligne 8;Richelieu - Drouot
+192;Ligne 8;Grands Boulevards
+193;Ligne 8;Bonne Nouvelle
+194;Ligne 8;Strasbourg - Saint-Denis
+195;Ligne 8;République
+196;Ligne 8;Filles du Calvaire
+197;Ligne 8;Saint-Sébastien - Froissart
+198;Ligne 8;Chemin Vert
+199;Ligne 8;Bastille
+200;Ligne 8;Ledru-Rollin
+201;Ligne 8;Faidherbe - Chaligny
+202;Ligne 8;Reuilly - Diderot
+203;Ligne 8;Montgallet
+204;Ligne 8;Daumesnil
+205;Ligne 8;Michel Bizot
+206;Ligne 8;Porte Dorée
+207;Ligne 8;Porte de Charenton
+208;Ligne 9;Porte de Saint-Cloud
+209;Ligne 9;Exelmans
+210;Ligne 9;Michel-Ange - Molitor
+211;Ligne 9;Michel-Ange - Auteuil
+212;Ligne 9;Jasmin
+213;Ligne 9;Ranelagh
+214;Ligne 9;La Muette
+215;Ligne 9;Rue de la Pompe
+216;Ligne 9;Trocadéro
+217;Ligne 9;Iéna
+218;Ligne 9;Alma - Marceau
+219;Ligne 9;Franklin D. Roosevelt
+220;Ligne 9;Saint-Philippe du Roule
+221;Ligne 9;Miromesnil
+222;Ligne 9;Saint-Augustin
+223;Ligne 9;Havre-Caumartin
+224;Ligne 9;Chaussée d'Antin - La Fayette
+225;Ligne 9;Richelieu - Drouot
+226;Ligne 9;Grands Boulevards
+227;Ligne 9;Bonne Nouvelle
+228;Ligne 9;Strasbourg - Saint-Denis
+229;Ligne 9;République
+230;Ligne 9;Oberkampf
+231;Ligne 9;Saint-Ambroise
+232;Ligne 9;Voltaire
+233;Ligne 9;Charonne
+234;Ligne 9;Rue des Boulets
+235;Ligne 9;Nation
+236;Ligne 9;Buzenval
+237;Ligne 9;Maraîchers
+238;Ligne 9;Porte de Montreuil
+239;Ligne 10;Gare d'Austerlitz
+240;Ligne 10;Jussieu
+241;Ligne 10;Cardinal Lemoine
+242;Ligne 10;Maubert - Mutualité
+243;Ligne 10;Cluny - La Sorbonne
+244;Ligne 10;Odéon
+245;Ligne 10;Mabillon
+246;Ligne 10;Sèvres - Babylone
+247;Ligne 10;Vaneau
+248;Ligne 10;Duroc
+249;Ligne 10;Ségur
+250;Ligne 10;La Motte-Picquet - Grenelle
+251;Ligne 10;Avenue Emile Zola
+252;Ligne 10;Charles Michels
+253;Ligne 10;Javel - André Citroën
+254;Ligne 10;Eglise d'Auteuil
+255;Ligne 10;Michel-Ange - Auteuil
+256;Ligne 10;Porte d'Auteuil
+257;Ligne 10;Michel-Ange - Molitor
+258;Ligne 10;Chardon Lagache
+259;Ligne 10;Mirabeau
+260;Ligne 10;Javel - André Citroën
+261;Ligne 11;Châtelet
+262;Ligne 11;Hôtel de Ville
+263;Ligne 11;Rambuteau
+264;Ligne 11;Arts et Métiers
+265;Ligne 11;République
+266;Ligne 11;Goncourt
+267;Ligne 11;Belleville
+268;Ligne 11;Pyrénées
+269;Ligne 11;Jourdain
+270;Ligne 11;Place des FÃªtes
+271;Ligne 11;Télégraphe
+272;Ligne 11;Porte des Lilas
+273;Ligne 12;Porte de la Chapelle
+274;Ligne 12;Marx Dormoy
+275;Ligne 12;Marcadet - Poissonniers
+276;Ligne 12;Jules Joffrin
+277;Ligne 12;Lamarck - Caulaincourt
+278;Ligne 12;Abbesses
+279;Ligne 12;Pigalle
+280;Ligne 12;Saint-Georges
+281;Ligne 12;Notre-Dame-de-Lorette
+282;Ligne 12;Trinité - d'Estienne d'Orves
+283;Ligne 12;Saint-Lazare
+284;Ligne 12;Madeleine
+285;Ligne 12;Concorde
+286;Ligne 12;Assemblée Nationale
+287;Ligne 12;Solférino
+288;Ligne 12;Rue du Bac
+289;Ligne 12;Sèvres - Babylone
+290;Ligne 12;Rennes
+291;Ligne 12;Notre-Dame des Champs
+292;Ligne 12;Montparnasse Bienvenue
+293;Ligne 12;Falguière
+294;Ligne 12;Pasteur
+295;Ligne 12;Volontaires
+296;Ligne 12;Vaugirard
+297;Ligne 12;Convention
+298;Ligne 12;Porte de Versailles
+299;Ligne 13;Porte de Vanves
+300;Ligne 13;Plaisance
+301;Ligne 13;Pernety
+302;Ligne 13;Gaîté
+303;Ligne 13;Montparnasse Bienvenue
+304;Ligne 13;Duroc
+305;Ligne 13;Saint-François-Xavier
+306;Ligne 13;Varenne
+307;Ligne 13;Invalides
+308;Ligne 13;Champs-Elysées - Clemenceau
+309;Ligne 13;Miromesnil
+310;Ligne 13;Saint-Lazare
+311;Ligne 13;Liège
+312;Ligne 13;Place de Clichy
+313;Ligne 13;La Fourche
+314;Ligne 13;Guy Môquet
+315;Ligne 13;Porte de Saint-Ouen
+316;Ligne 13;La Fourche
+317;Ligne 13;Brochant
+318;Ligne 13;Porte de Clichy
+319;Ligne 14;Porte de Clichy
+320;Ligne 14;Pont Cardinet
+321;Ligne 14;Saint-Lazare
+322;Ligne 14;Madeleine
+323;Ligne 14;Pyramides
+324;Ligne 14;Châtelet
+325;Ligne 14;Gare de Lyon
+326;Ligne 14;Bercy
+327;Ligne 14;Cour Saint-Emilion
+328;Ligne 14;Bibliothèque François Mitterrand
+329;Ligne 14;Olympiades
+330;Ligne 14;Maison Blanche
