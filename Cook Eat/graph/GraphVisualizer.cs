@@ -7,7 +7,7 @@ namespace Cook_Eat
     /// Classe s'occupant de la visualisation d'un graphe sous forme d'image.
     /// Permet de dessiner les nœuds et les liens du graphe, avec des options pour le positionnement des nœuds et la coloration.
     /// </summary>
-    public class GraphVisualizer<T> 
+    public class GraphVisualizer<T>
     {
         /// <summary>
         /// Le graphe à visualiser.
@@ -49,6 +49,16 @@ namespace Cook_Eat
         /// </summary>
         private bool useRegularPositioning;
 
+        /// <summary>
+        /// Indique si les nœuds doivent être positionnés en fonction de leurs coordonnées.
+        /// </summary>
+        private bool useMetroPositioning;
+
+        /// <summary>
+        /// Dictionnaire stockant la longitude et la latitude des stations.
+        /// </summary>
+        Dictionary<int, (double, double)> pos = Graph<int>.ReadFileToHaveNodesPosition("../../../data/pos.txt");
+
 
 
         /// <summary>
@@ -58,12 +68,13 @@ namespace Cook_Eat
         /// <param name="useRegularPositioning">True pour positionner les nœuds en cercle, False pour un positionnement aléatoire.</param>
         /// <param name="width">Largeur de l'image.</param>
         /// <param name="height">Hauteur de l'image.</param>
-        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning = false, int width = 1600, int height = 1200)
+        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning = false, bool useMetroPositioning = true, int width = 1600, int height = 1200)
         {
             this.graph = graph;
             this.width = width;
             this.height = height;
             this.useRegularPositioning = useRegularPositioning;
+            this.useMetroPositioning = useMetroPositioning;
 
             bitmap = new Bitmap(width, height);
             graphics = Graphics.FromImage(bitmap);
@@ -71,7 +82,14 @@ namespace Cook_Eat
             nodePositions = new Dictionary<Node<T>, PointF>();
             nodeColors = new Dictionary<Node<T>, Brush>();
 
-            AssignRandomColors(); // Attribue des couleurs aléatoires aux nœuds
+            if (useMetroPositioning)
+            {
+                AssignMetroLineColors(); // Attribue les couleurs des lignes de métro
+            }
+            else
+            {
+                AssignRandomColors(); // Attribue des couleurs aléatoires
+            }
         }
 
 
@@ -98,6 +116,10 @@ namespace Cook_Eat
             if (useRegularPositioning)
             {
                 CalculateRegularPositions(); // Positionnement en cercle
+            }
+            else if (useMetroPositioning)
+            {
+                CalculateStationPosition(pos);
             }
             else
             {
@@ -145,6 +167,57 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Calcule les positions normalisées des stations sur un graphique en fonction de leurs coordonnées géographiques (latitude, longitude).
+        /// Les coordonnées sont normalisées dans une plage spécifique pour ajuster leur position sur un plan 2D.
+        /// </summary>
+        /// <param name="position">
+        /// Dictionnaire contenant les identifiants des stations comme clé et un tuple de coordonnées géographiques (longitude, latitude) comme valeur.
+        /// La clé représente l'identifiant de la station, et la valeur représente sa position géographique sous forme de tuple (longitude, latitude).
+        /// </param>
+        /// <remarks>
+        /// Cette méthode prend en entrée un dictionnaire de positions des stations sous forme de coordonnées géographiques et ajuste ces positions 
+        /// pour les rendre adaptées à une représentation 2D sur un graphique. Elle calcule les coordonnées minimales et maximales de 
+        /// la longitude et de la latitude, puis effectue une normalisation des coordonnées pour les faire entrer dans une plage définie 
+        /// (de 50 à 1600 pour la longitude et de 50 à 1200 pour la latitude). L'axe Y est inversé pour correspondre à l'orientation 
+        /// attendue du graphique, où le bas du graphique a les valeurs les plus grandes. Les positions normalisées sont ensuite 
+        /// enregistrées dans un dictionnaire pour être utilisées lors de l'affichage du graphique.
+        /// </remarks>
+        private void CalculateStationPosition(Dictionary<int, (double, double)> position)
+        {
+            if (position == null || position.Count == 0)
+                return;
+
+            double minLon = double.MaxValue, maxLon = double.MinValue;
+            double minLat = double.MaxValue, maxLat = double.MinValue;
+
+            foreach (var item in position.Values)
+            {
+                if (item.Item1 < minLon) minLon = item.Item1;
+                if (item.Item1 > maxLon) maxLon = item.Item1;
+                if (item.Item2 < minLat) minLat = item.Item2;
+                if (item.Item2 > maxLat) maxLat = item.Item2;
+            }
+
+            double rangeLon = maxLon - minLon;
+            double rangeLat = maxLat - minLat;
+
+            foreach (var key in position.Keys)
+            {
+                double x = ((position[key].Item1 - minLon) / rangeLon) * (1600 - 100) + 50;
+                double y = ((position[key].Item2 - minLat) / rangeLat) * (1200 - 100) + 50;
+                y = 1200 - y; // Inversion de l'axe Y
+
+                // Trouve le nœud correspondant dans le graphe
+                Node<T> node = graph.Nodes.FirstOrDefault(n => n.Id == key);
+                if (node != null)
+                {
+                    nodePositions[node] = new PointF((float)x, (float)y); // Met à jour nodePositions
+                }
+            }
+        }
+
+
+        /// <summary>
         /// Calcule des positions régulières pour les nœuds, en les plaçant en cercle.
         /// </summary>
         private void CalculateRegularPositions()
@@ -182,14 +255,14 @@ namespace Cook_Eat
         /// <summary>
         /// Dessine le graphe sur l'image.
         /// </summary>
-        private void DrawGraph()
+        public void DrawGraph(List<(Node<int>, Node<int>)> path =null)
         {
             graphics.Clear(Color.White); // Efface l'image avec un fond blanc
 
             // Dessine les liens
             foreach (var link in graph.Links)
             {
-                DrawLink(link);
+                DrawLink(link, path);
             }
 
             // Dessine les nœuds
@@ -211,7 +284,14 @@ namespace Cook_Eat
             float nodeSize = Math.Max(20, 80 - totalNodes); // Taille du nœud en fonction du nombre total de nœuds
 
             // Dessine le cercle représentant le nœud
-            graphics.FillEllipse(nodeColors[node], position.X - nodeSize / 2, position.Y - nodeSize / 2, nodeSize, nodeSize);
+            if (nodeColors.ContainsKey(node))
+            {
+                graphics.FillEllipse(nodeColors[node], position.X - nodeSize / 2, position.Y - nodeSize / 2, nodeSize, nodeSize);
+            }
+            else
+            {
+                graphics.FillEllipse(new SolidBrush(Color.Black), position.X - nodeSize / 2, position.Y - nodeSize / 2, nodeSize, nodeSize);
+            }
 
             // Ajoute l'identifiant du nœud au centre
             string nodeId = node.Id.ToString();
@@ -225,20 +305,44 @@ namespace Cook_Eat
         /// Dessine un lien entre deux nœuds.
         /// </summary>
         /// <param name="link">Le lien à dessiner.</param>
-        private void DrawLink(Link<T> link)
+        private void DrawLink(Link<T> link, List<(Node<int>, Node<int>)> path = null)
         {
             var start = nodePositions[link.StartNode];
             var end = nodePositions[link.EndNode];
 
-            if (link.StartNode.Id != link.EndNode.Id)
+            bool isHighlighted = path != null && path.Count > 0 && path.Any(p => (p.Item1.Id == link.StartNode.Id && p.Item2.Id == link.EndNode.Id) || (p.Item2.Id == link.StartNode.Id && p.Item1.Id == link.EndNode.Id));
+
+            if (link.StartNode.Id != link.EndNode.Id) // Lien normal
             {
-                // Dessine une ligne pour les liens normaux
-                graphics.DrawLine(Pens.Black, start, end);
+                if (isHighlighted)
+                {
+                    using (Pen highlightPen = new Pen(nodeColors[link.StartNode], 10))
+                    {
+                        graphics.DrawLine(highlightPen, start, end);
+                    }
+                }
+
+                if (nodeColors.ContainsKey(link.StartNode))
+                {
+                    using (Pen penFin = new Pen(nodeColors[link.StartNode], 2))
+                    {
+                        graphics.DrawLine(penFin, start, end);
+                    }
+                }
+                else
+                {
+                    using (Pen penFin = new Pen(Color.Black, 5))
+                    {
+                        graphics.DrawLine(penFin, start, end);
+                    }
+                }
             }
-            else
+            else // Lien réflexif (boucle)
             {
-                // Dessine une boucle pour les liens réflexifs
-                graphics.DrawEllipse(Pens.Black, start.X - 20, start.Y - 20, 80, 80);
+                using (Pen penFin = new Pen(nodeColors[link.StartNode]))
+                {
+                    graphics.DrawEllipse(penFin, new RectangleF(start.X - 5, start.Y - 5, 10, 10));
+                }
             }
 
             // Ajoute le poids du lien si le graphe est pondéré
@@ -251,7 +355,19 @@ namespace Cook_Eat
             // Ajoute une flèche si le graphe est orienté
             if (graph.isDirected)
             {
-                DrawArrowhead(start, end);
+                DrawArrowhead(start, end, link.StartNode);
+            }
+        }
+
+
+        /// <summary>
+        /// Attribue les couleurs des lignes de métro à chaque nœud.
+        /// </summary>
+        private void AssignMetroLineColors()
+        {
+            foreach (var node in graph.Nodes)
+            {
+                nodeColors[node] = new SolidBrush(node.color); // Utilise la couleur de la ligne de métro du nœud
             }
         }
 
@@ -261,7 +377,7 @@ namespace Cook_Eat
         /// </summary>
         /// <param name="start">Point de départ du lien.</param>
         /// <param name="end">Point d'arrivée du lien.</param>
-        private void DrawArrowhead(PointF start, PointF end)
+        private void DrawArrowhead(PointF start, PointF end, Node<T> startNode)
         {
             float size = 6; // Taille de la flèche
             float offset = 28; // Distance entre la flèche et le nœud
@@ -273,8 +389,11 @@ namespace Cook_Eat
             float squareX = end.X - dx / length * offset - size / 2;
             float squareY = end.Y - dy / length * offset - size / 2;
 
-            // Dessine un carré pour représenter la flèche
-            graphics.FillRectangle(Brushes.Black, squareX, squareY, size, size);
+            // Vérifier si le nœud a une couleur attribuée
+            if (nodeColors.ContainsKey(startNode))
+            {
+                graphics.FillRectangle(nodeColors[startNode], squareX, squareY, size, size);
+            }
         }
 
 

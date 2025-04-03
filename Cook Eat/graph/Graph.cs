@@ -459,31 +459,65 @@ namespace Cook_Eat
         /// <param name="method">La méthode choisie : 1 pour Dijkstra sinon Bellman-Ford est utilisée.</param>
         /// <returns>Un tuple avec une liste contenant les Ids des noeuds permettant le plus court 
         /// chemin de source vers target ainsi que le poids total de ce chemin.</returns>
-        public (List<int>, double) ShortestPath(Node<T> source, Node<T> target, int method)
+        public (List<Node<T>>, double) ShortestPath(Node<T> source, Node<T> target, int method)
         {
-            List<int> path = [];
-            Stack<int> tmp = [];
+            List<Node<T>> pathNodes = new List<Node<T>>();
+            Stack<Node<T>> tmp = new Stack<Node<T>>();
             (double, int)[] dist;
-            if (method == 1) { dist = Dijkstra(source); }
-            else { dist = BellmanFord(source); }
+
+            if (method == 1)
+            {
+                dist = Dijkstra(source);
+            }
+            else
+            {
+                dist = BellmanFord(source);
+            }
+
             if (dist != null)
             {
                 int i = target.Id - 1;
                 if (dist[i].Item1 != double.MaxValue)
                 {
-                    while (i != source.Id - 1)
+                    Node<T> currentNode = target;
+                    while (currentNode.Id != source.Id)
                     {
-                        tmp.Push(i + 1);
-                        i = dist[i].Item2;
+                        tmp.Push(currentNode);
+                        currentNode = Nodes.FirstOrDefault(n => n.Id == dist[i].Item2 + 1); // Trouver le nœud précédent
+                        if (currentNode == null) break; // Sortir si le nœud précédent n'est pas trouvé
+                        i = currentNode.Id - 1;
                     }
-                    tmp.Push(source.Id);
+                    tmp.Push(source);
+
                     while (tmp.Count != 0)
                     {
-                        path.Add(tmp.Pop());
+                        pathNodes.Add(tmp.Pop());
                     }
                 }
             }
-            return (path, dist[target.Id - 1].Item1);
+
+            return (pathNodes, dist != null ? dist[target.Id - 1].Item1 : double.MaxValue);
+        }
+
+        /// <summary>
+        /// Lit un fichier texte pour le transformer en une collection qui associe à chaque
+        /// noeud (représenté par son id) ses coordonnées dans l'espace (longitude et latitude).
+        /// <param name="path">Chemin du fichier contenant les données.</param>
+        /// <returns>Un dictionnaire assiociant chaque noeud à sa position.</returns>
+        public static Dictionary<int, (double, double)> ReadFileToHaveNodesPosition(string path)
+        {
+            string[] lines = File.ReadAllLines(path);
+            Dictionary<int, (double, double)> pos = [];
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string[] parts = lines[i].Split(";");
+                int id = int.Parse(parts[0]);
+                double longitude = double.Parse(parts[1]);
+                double latitude = double.Parse(parts[2]);
+                pos[id] = (longitude, latitude);
+            }
+            return pos;
         }
     }
 }

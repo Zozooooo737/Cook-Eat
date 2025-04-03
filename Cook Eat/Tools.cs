@@ -10,7 +10,7 @@ namespace Cook_Eat
         /// </summary>
         public static void TransportNetwork()
         {
-            Graph g = new Graph(isDirected: true, isWeighted: true);
+            Graph<int> g = new Graph<int>(isDirected: true, isWeighted: true);
             Dictionary<int, (double, double)> pos = ReadFileToHaveNodesPosition("../../../data/pos.txt");
             List<Node<int>> nodes = ReadFileToCreateDetailedNodes("../../../data/stations.txt");
             g.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", pos, nodes), nodes);
@@ -31,7 +31,7 @@ namespace Cook_Eat
         /// </summary>
         /// <param name="path">Chemin du fichier contenant les données.</param>
         /// <returns>Une liste contenant l'ensemble des noeuds créés.</returns>
-        private static List<Node<int>> ReadFileToCreateDetailedNodes(string path)
+        public static List<Node<int>> ReadFileToCreateDetailedNodes(string path)
         {
             string[] lines = File.ReadAllLines(path);
             List<Node<int>> nodes = [];
@@ -54,7 +54,7 @@ namespace Cook_Eat
         /// noeud (représenté par son id) ses coordonnées dans l'espace (longitude et latitude).
         /// <param name="path">Chemin du fichier contenant les données.</param>
         /// <returns>Un dictionnaire assiociant chaque noeud à sa position.</returns>
-        private static Dictionary<int,(double,double)> ReadFileToHaveNodesPosition(string path)
+        public static Dictionary<int,(double,double)> ReadFileToHaveNodesPosition(string path)
         {
             string[] lines = File.ReadAllLines(path);
             Dictionary<int,(double,double)> pos = [];
