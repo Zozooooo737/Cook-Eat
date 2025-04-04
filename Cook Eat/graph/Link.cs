@@ -11,7 +11,7 @@
         /// </summary>
         public Node<T> StartNode { get; }
 
-        /// <summary>
+        /// <summary>       
         /// Le nœud d'arrivée du lien.
         /// </summary>
         public Node<T> EndNode { get; }

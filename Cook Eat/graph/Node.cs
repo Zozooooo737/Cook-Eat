@@ -14,40 +14,44 @@ namespace Cook_Eat
         public int Id { get; }
 
         /// <summary>
-        /// Le groupe auquel le noeud appartient.
-        /// </summary>
-        public string Group { get; }
-
-        /// <summary>
-        /// La description du noeud, ce qu'il représente.
-        /// </summary>
-        public string Description { get; }
-
-        /// <summary>
         /// L'ensemble des successeurs du nœud.
         /// Un successeur est un nœud directement accessible depuis ce nœud via un lien.
         /// </summary>
         public HashSet<Node<T>> Successors { get; }
 
         /// <summary>
-        /// La couleur de la ligne de métro associée au nœud.
+        /// L'entité transportée et représentée par ce noeud.
         /// </summary>
-        public Color color { get; }
+        public T Entity { get; }
+
+
 
         /// <summary>
         /// Constructeur de la classe Node.
         /// </summary>
         /// <param name="id">L'identifiant unique du nœud.</param>
-        /// <param name="group">Le groupe du noeud.</param>
-        /// <param name="description">La description du noeud.</param>
-        public Node(int id, string group, string description)
+        /// <param name="entity">L'entité que le noeud va transporter.</param>
+        public Node(int id, T entity)
         {
             Id = id;
-            Group = group;
-            Description = description;
             Successors = new HashSet<Node<T>>();
-            color = GetMetroLineColor(group); // Définit la couleur en fonction du groupe
+            Entity = entity;
         }
+
+
+
+        /// <summary>
+        /// Constructeur de la classe Node lorsque celui-ci n'a pas 
+        /// encore d'entité spécifique à représenter.
+        /// </summary>
+        /// <param name="id">L'identifiant unique du nœud.</param>
+        public Node(int id)
+        {
+            Id = id;
+            Successors = new HashSet<Node<T>>();
+        }
+
+
 
         /// <summary>
         /// Ajoute un nœud successeur à la liste des successeurs du nœud actuel.

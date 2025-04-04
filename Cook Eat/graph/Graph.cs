@@ -48,6 +48,27 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Constructeur de la classe Graph à partir d'un graphe déjà créé.
+        /// Ce constructeur permet d'obtenir un sous-graphe.
+        /// </summary>
+        /// <param name="graph">Le graphe d'origine.</param>
+        /// <param name="nodes">La liste des noeuds à conserver.</param>
+        public Graph(Graph<T> graph, List<Node<T>> nodes)
+        {
+            Nodes = nodes;
+            Links = new List<Link<T>>();
+            foreach (Link<T> link in graph.Links)
+            {
+                if(nodes.Any(n => n.Id == link.StartNode.Id) && nodes.Any(n => n.Id == link.EndNode.Id)) { Links.Add(link); }
+            }
+
+            this.isDirected = graph.isDirected;
+            this.isWeighted = graph.isWeighted;
+        }
+
+
+
+        /// <summary>
         /// Ajoute un nœud au graphe s'il n'existe pas déjà.
         /// </summary>
         /// <param name="id">L'identifiant du nœud à ajouter.</param>
@@ -55,7 +76,22 @@ namespace Cook_Eat
         {
             if (!Nodes.Any(n => n.Id == id))
             {
-                Nodes.Add(new Node<T>(id, null, null));
+                Nodes.Add(new Node<T>(id));
+            }
+        }
+
+
+        /// <summary>
+        /// Ajoute un nœud au graphe s'il n'existe pas déjà et
+        /// relie ce noeud à l'entité qu'il doit représenter.
+        /// </summary>
+        /// <param name="id">L'identifiant du nœud à ajouter.</param>
+        /// <param name="entity">L'entité du nœud à représenter.</param>
+        public void AddNodeWithEntity(int id, T entity)
+        {
+            if (!Nodes.Any(n => n.Id == id))
+            {
+                Nodes.Add(new Node<T>(id, entity));
             }
         }
 
@@ -84,11 +120,11 @@ namespace Cook_Eat
         public void AddLink(int sourceId, int targetId, double weight = 1.0)
         {
             // Recherche ou création du nœud source
-            Node<T> source = Nodes.FirstOrDefault(n => n.Id == sourceId) ?? new Node<T>(sourceId, null, null);
+            Node<T> source = Nodes.FirstOrDefault(n => n.Id == sourceId) ?? new Node<T>(sourceId);
             if (!Nodes.Contains(source)) Nodes.Add(source);
 
             // Recherche ou création du nœud cible
-            Node<T> target = Nodes.FirstOrDefault(n => n.Id == targetId) ?? new Node<T>(targetId, null, null);
+            Node<T> target = Nodes.FirstOrDefault(n => n.Id == targetId) ?? new Node<T>(targetId);
             if (!Nodes.Contains(target)) Nodes.Add(target);
 
             // Vérifie si le lien existe déjà pour éviter les doublons
@@ -350,7 +386,7 @@ namespace Cook_Eat
             int min = source.Id;
             for (int i = 0; i < Nodes.Count; i++)
             {
-                visited[min] = true;
+                visited[min-1] = true;
                 foreach (Link<T> link in Links)
                 {
                     if (link.StartNode.Id == min && !visited[link.EndNode.Id - 1])
@@ -495,6 +531,7 @@ namespace Cook_Eat
                     else { dist[i, j] = (double.MaxValue, -1); }
                 }
             }
+
             foreach (Link<T> link in Links)
             {
                 dist[link.StartNode.Id - 1, link.EndNode.Id - 1] = (link.Weight, link.StartNode.Id - 1);
@@ -527,15 +564,25 @@ namespace Cook_Eat
         /// <returns>Un tuple avec une liste contenant les Ids des noeuds permettant le plus court 
         /// chemin de source vers target ainsi que le poids total de ce chemin.
         /// OU retourne un tuple avec null et 0 si le chemin n'existe pas.</returns>
-        public (List<int>, double) ShortestPathFloyd(Node<T> source, Node<T> target)
+        public (List<Node<T>>, double) ShortestPathFloyd(Node<T> source, Node<T> target)
         {
             (double, int)[,] dist = FloydWarshall();
 
             if (dist[source.Id - 1, target.Id - 1].Item1 == double.MaxValue) { return (null, 0); }
 
-            List<int> path = [];
+            List<int> path = new List<int>();
             FloydPathRec(source.Id - 1, target.Id - 1, dist, path);
-            return (path, dist[source.Id - 1, target.Id - 1].Item1);
+
+            List<Node<T>> pathN = new List<Node<T>>();
+            foreach (int id in path)
+            {
+                foreach (Node<T> node in Nodes)
+                {
+                    if (id + 1 == node.Id) { pathN.Add(node); }
+                }
+            }
+            pathN.Add(target);
+            return (pathN, dist[source.Id - 1, target.Id - 1].Item1);
         }
 
 
@@ -552,15 +599,13 @@ namespace Cook_Eat
         public void FloydPathRec(int i, int j, (double, int)[,] dist, List<int> path)
         {
             int k = dist[i, j].Item2;
-            if (k == -1)
+            if (k == i)
             {
-                if (path.Count == 0 || path[path.Count - 1] != i) { path.Add(i); }
-                if (i != j) { path.Add(j); }
+                path.Add(i);
             }
             else
             {
                 FloydPathRec(i, k, dist, path);
-                path.RemoveAt(path.Count - 1);
                 FloydPathRec(k, j, dist, path);
             }
         }
