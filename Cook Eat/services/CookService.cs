@@ -90,7 +90,7 @@ namespace Cook_Eat.services
                     END as 'Statut',
                     DATE_FORMAT(p.preparation_date, '%d/%m/%Y %H:%i') as 'Date préparation',
                     DATE_FORMAT(p.peremption_date, '%d/%m/%Y') as 'Date péremption',
-                    CONCAT(p.price, ' €') as 'Prix',
+                    CONCAT(p.price, ' $') as 'Prix',
                     CONCAT(p.number_of_person, ' pers.') as 'Portions'
                 FROM dish_preparation p
                 JOIN dish d ON p.dish_id = d.dish_id

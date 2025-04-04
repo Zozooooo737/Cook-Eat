@@ -167,5 +167,74 @@ namespace Cook_Eat
             GraphVisualizer<Station> visualizer1 = new GraphVisualizer<Station>(graph, false, true, false);
             visualizer1.Visualize("stations.png", path, model);
         }
+
+
+        /// <summary>
+        /// Génère le trajet entre deux stations de métro à partir de leurs noms
+        /// </summary>
+        /// <param name="stationDepart">Nom de la station de départ</param>
+        /// <param name="stationArrivee">Nom de la station d'arrivée</param>
+        /// <param name="model">Modèle d'affichage (true pour chemin seul, false pour carte entière)</param>
+        public static void GenererTrajetParNoms(string stationDepart, string stationArrivee, bool model)
+        {
+            // Création du réseau de transport
+            Graph<Station> TransportNetwork = new Graph<Station>(true, true);
+            List<Node<Station>> nodes = ReadFileToCreateStationNodes("../../../data/detailedStations.txt");
+            TransportNetwork.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", nodes), nodes);
+
+            // Recherche des noeuds correspondants aux noms de stations
+            Node<Station> departNode = null;
+            Node<Station> arriveeNode = null;
+    
+            foreach (Node<Station> node in TransportNetwork.Nodes)
+            {
+                if (node.Entity.Name.Equals(stationDepart, StringComparison.OrdinalIgnoreCase))
+                {
+                    departNode = node;
+                }
+                if (node.Entity.Name.Equals(stationArrivee, StringComparison.OrdinalIgnoreCase))
+                {
+                    arriveeNode = node;
+                }
+            }
+
+            // Vérification que les stations existent
+            if (departNode == null)
+            {
+                Console.WriteLine($"Station de départ '{stationDepart}' non trouvée.");
+                return;
+            }
+            if (arriveeNode == null)
+            {
+                Console.WriteLine($"Station d'arrivée '{stationArrivee}' non trouvée.");
+                return;
+            }
+
+            // Calcul et affichage du trajet
+            Console.WriteLine($"\nTrajet de {stationDepart} à {stationArrivee} :");
+            (List<Node<Station>>, double) pathN = TransportNetwork.ShortestPathFloyd(departNode, arriveeNode);
+            List<Node<Station>> path = pathN.Item1;
+    
+            Console.WriteLine($"\nDistance totale : {pathN.Item2} minutes");
+            Console.WriteLine("Itinéraire :");
+    
+            string currentLine = null;
+            foreach (Node<Station> node in path)
+            {
+                // Affiche le changement de ligne si nécessaire
+                if (currentLine != node.Entity.Line.ToString())
+                {
+                    if (currentLine != null)
+                        Console.WriteLine($"↳ Correspondance à {node.Entity.Name} - Ligne {node.Entity.Line}");
+                    currentLine = node.Entity.Line.ToString();
+                }
+                Console.WriteLine($"{node.Entity.Name} (Ligne {node.Entity.Line})");
+            }
+
+            // Visualisation graphique
+            GraphVisualizer<Station> visualizer = new GraphVisualizer<Station>(TransportNetwork, false, true, false);
+            visualizer.Visualize("trajet.png", path, model);
+            Console.WriteLine("\nVisualisation du trajet sauvegardée dans 'trajet.png'");
+        }
     }
 }

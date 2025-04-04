@@ -8,6 +8,7 @@
                 "Module Utilisateurs",
                 "Module Clients",
                 "Module Cuisiniers",
+                "Module Plats",
                 "Module Commandes",
                 "Module Statistiques",
                 "Quitter l'application"
@@ -31,9 +32,15 @@
                         CookModule.Show();
                         break;
                     case 3:
-                        // StatsModule.Show();
+                        DishModule.Show();
+                        break;
+                    case 4:
+                        OrderModule.Show();
                         break;
                     case 5:
+                        StatsModule.Show();
+                        break;
+                    case 6:
                         Console.WriteLine("\nMerci d'avoir utilisé Cook'Eat. À bientôt !");
                         return;
                 }

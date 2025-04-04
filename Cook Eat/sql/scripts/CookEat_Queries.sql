@@ -1,6 +1,6 @@
 -- Récupérer tous les noms des utilisateurs avec leurs coordonnées ou avec leurs identifiants (Table "user Account").
 
-SELECT * FROM user_account;
+SELECT * FROM client_transaction;
 SELECT first_name, last_name FROM user_account ORDER BY last_name ASC;
 SELECT * FROM user_account WHERE is_business = 1;
 SELECT first_name, last_name, email, phone_number FROM user_account ORDER BY first_name ASC;
