@@ -7,7 +7,7 @@ namespace Cook_Eat
     /// Classe s'occupant de la visualisation d'un graphe sous forme d'image.
     /// Permet de dessiner les nœuds et les liens du graphe, avec des options pour le positionnement des nœuds et la coloration.
     /// </summary>
-    public class GraphVisualizer<T>
+    public class GraphVisualizer<T> where T : INode
     {
         /// <summary>
         /// Le graphe à visualiser.
@@ -55,6 +55,11 @@ namespace Cook_Eat
         private bool useMetroPositioning;
 
         /// <summary>
+        /// Indique si les nœuds doivent être positionnés sur une ligne horizontale.
+        /// </summary>
+        private bool useHorizontalPositioning;
+
+        /// <summary>
         /// Dictionnaire stockant la longitude et la latitude des stations.
         /// </summary>
         Dictionary<int, (double, double)> pos = Graph<int>.ReadFileToHaveNodesPosition("../../../data/pos.txt");
@@ -68,21 +73,23 @@ namespace Cook_Eat
         /// <param name="useRegularPositioning">True pour positionner les nœuds en cercle, False pour un positionnement aléatoire.</param>
         /// <param name="width">Largeur de l'image.</param>
         /// <param name="height">Hauteur de l'image.</param>
-        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning = false, bool useMetroPositioning = true, int width = 1600, int height = 1200)
+        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning, bool useMetroPositioning, bool useHorizontalPositioning, int width = 1600, int height = 1200)
         {
             this.graph = graph;
-            this.width = width;
+            if (useHorizontalPositioning) { this.width = 3500; }
+            else { this.width = width; }
             this.height = height;
             this.useRegularPositioning = useRegularPositioning;
             this.useMetroPositioning = useMetroPositioning;
+            this.useHorizontalPositioning = useHorizontalPositioning;
 
-            bitmap = new Bitmap(width, height);
+            bitmap = new Bitmap(this.width,this.height);
             graphics = Graphics.FromImage(bitmap);
 
             nodePositions = new Dictionary<Node<T>, PointF>();
             nodeColors = new Dictionary<Node<T>, Brush>();
 
-            if (useMetroPositioning)
+            if (useMetroPositioning || useHorizontalPositioning)
             {
                 AssignMetroLineColors(); // Attribue les couleurs des lignes de métro
             }
@@ -98,12 +105,24 @@ namespace Cook_Eat
         /// Visualise le graphe en générant une image et en l'enregistrant à l'emplacement spécifié.
         /// </summary>
         /// <param name="outputPath">Le chemin où enregistrer l'image.</param>
-        public void Visualize(string outputPath)
+        public void Visualize(string outputPath, List<Node<T>> path, bool DrawOnlyPath)
         {
-            CalculateNodePositions(); // Calcule les positions des nœuds
-            DrawGraph(); // Dessine le graphe
-            SaveImage(outputPath); // Enregistre l'image
-            OpenImage(outputPath); // Ouvre l'image
+            if (DrawOnlyPath)
+            {
+                List<Node<T>> nodes = [];
+                foreach(Node<T> element in path) { if (!nodes.Contains(element)) { nodes.Add(element); }
+                }
+                Graph<T> tmp = new Graph<T>(graph, nodes);
+                GraphVisualizer<T> visualizer = new GraphVisualizer<T>(tmp, false, false, true, 3000);
+                visualizer.Visualize("stations.png", path, false);
+            }
+            else
+            {
+                CalculateNodePositions(); // Calcule les positions des nœuds
+                DrawGraph(path); // Dessine le graphe
+                SaveImage(outputPath); // Enregistre l'image
+                OpenImage(outputPath); // Ouvre l'image
+            }
         }
 
 
@@ -120,6 +139,10 @@ namespace Cook_Eat
             else if (useMetroPositioning)
             {
                 CalculateStationPosition(pos);
+            }
+            else if (useHorizontalPositioning)
+            {
+                CalculateHorizontalPositions();
             }
             else
             {
@@ -240,6 +263,29 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Calcule des positions régulières pour les nœuds, en les plaçant sur une ligne horizontale centrée.
+        /// </summary>
+        private void CalculateHorizontalPositions()
+        {
+            int centerX = width / 2;
+            int centerY = height / 2; // Centre de l'écran sur l'axe vertical
+            int count = graph.Nodes.Count;
+
+            if (count == 0) return;
+
+            double spacing = (double)width / (count + 3); // Espace entre chaque nœud
+            int index = 2;
+
+            foreach (var node in graph.Nodes)
+            {
+                float posX = (float)(index * spacing); // Calcul de la position X
+                nodePositions[node] = new PointF(posX, centerY); // Fixe Y au centre
+                index++;
+            }
+        }
+
+
+        /// <summary>
         /// Attribue des couleurs aléatoires à chaque nœud.
         /// </summary>
         private void AssignRandomColors()
@@ -255,7 +301,7 @@ namespace Cook_Eat
         /// <summary>
         /// Dessine le graphe sur l'image.
         /// </summary>
-        public void DrawGraph(List<(Node<int>, Node<int>)> path =null)
+        public void DrawGraph(List<Node<T>> path)
         {
             graphics.Clear(Color.White); // Efface l'image avec un fond blanc
 
@@ -268,7 +314,8 @@ namespace Cook_Eat
             // Dessine les nœuds
             foreach (var node in graph.Nodes)
             {
-                DrawNode(node);
+                if (useHorizontalPositioning) { DrawNodeWithName(node); }
+                else { DrawNode(node); }
             }
         }
 
@@ -302,15 +349,117 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Dessine un nœud avec son nom incliné à côté du cercle.
+        /// </summary>
+        /// <param name="node">Le nœud à dessiner.</param>
+        private void DrawNodeWithName(Node<T> node)
+        {
+            var position = nodePositions[node];
+            int totalNodes = graph.Nodes.Count;
+            float nodeSize = Math.Max(20, 80 - totalNodes); // Taille du nœud en fonction du nombre total de nœuds
+
+            // Dessine le cercle représentant le nœud
+            if (nodeColors.ContainsKey(node))
+            {
+                graphics.FillEllipse(nodeColors[node], position.X - nodeSize / 2, position.Y - nodeSize / 2, nodeSize, nodeSize);
+            }
+            else
+            {
+                graphics.FillEllipse(new SolidBrush(Color.Black), position.X - nodeSize / 2, position.Y - nodeSize / 2, nodeSize, nodeSize);
+            }
+
+            // Récupère le nom du nœud
+            string nodeName = node.Entity.Name;
+            switch (node.Entity.Line)
+            {
+                case 1:
+                    nodeName += "\n(Ligne 1)";
+                    break;
+                case 2:
+                    nodeName += "\n(Ligne 2)";
+                    break;
+                case 3:
+                    nodeName += "\n(Ligne 3)";
+                    break;
+                case 31:
+                    nodeName += "\n(Ligne 3 BIS)";
+                    break;
+                case 4:
+                    nodeName += "\n(Ligne 4)";
+                    break;
+                case 5:
+                    nodeName += "\n(Ligne 5)";
+                    break;
+                case 6:
+                    nodeName += "\n(Ligne 6)";
+                    break;
+                case 7:
+                    nodeName += "\n(Ligne 7)";
+                    break;
+                case 71:
+                    nodeName += "\n(Ligne 7 BIS)";
+                    break;
+                case 8:
+                    nodeName += "\n(Ligne 8)";
+                    break;
+                case 9:
+                    nodeName += "\n(Ligne 9)";
+                    break;
+                case 10:
+                    nodeName += "\n(Ligne 10)";
+                    break;
+                case 11:
+                    nodeName += "\n(Ligne 11)";
+                    break;
+                case 12:
+                    nodeName += "\n(Ligne 12)";
+                    break;
+                case 13:
+                    nodeName += "\n(Ligne 13)";
+                    break;
+                case 14:
+                    nodeName += "\n(Ligne 14)";
+                    break;
+            }
+
+            // Police pour le texte vertical
+            Font font = new Font("Arial", nodeSize / 4, FontStyle.Italic);
+            SizeF textSize = graphics.MeasureString(nodeName, font);
+
+            // Position du texte (juste au-dessus du cercle)
+            float textX = position.X;
+            float textY = position.Y - nodeSize / 1.5f - textSize.Height;
+
+            // Appliquer la transformation pour l'inclinaison verticale (90°)
+            graphics.TranslateTransform(textX, textY);
+            graphics.RotateTransform(-60); // Inclinaison verticale du texte
+            graphics.DrawString(nodeName, font, Brushes.DarkBlue, 0, 0);
+            graphics.ResetTransform(); // Réinitialise la transformation
+
+            // Ajoute l'identifiant du nœud au centre
+            string nodeId = node.Id.ToString();
+            Font idFont = new Font("Arial", nodeSize / 3);
+            SizeF idSize = graphics.MeasureString(nodeId, idFont);
+            graphics.DrawString(nodeId, idFont, Brushes.White, position.X - idSize.Width / 2, position.Y - idSize.Height / 2);
+        }
+
+
+        /// <summary>
         /// Dessine un lien entre deux nœuds.
+        /// Dessine de manière différente les liens du chemin emprunté pour mieux le repérer.
         /// </summary>
         /// <param name="link">Le lien à dessiner.</param>
-        private void DrawLink(Link<T> link, List<(Node<int>, Node<int>)> path = null)
+        /// <param name="path">Le chemin emprunté.</param>
+        private void DrawLink(Link<T> link, List<Node<T>> path)
         {
             var start = nodePositions[link.StartNode];
             var end = nodePositions[link.EndNode];
 
-            bool isHighlighted = path != null && path.Count > 0 && path.Any(p => (p.Item1.Id == link.StartNode.Id && p.Item2.Id == link.EndNode.Id) || (p.Item2.Id == link.StartNode.Id && p.Item1.Id == link.EndNode.Id));
+            bool isHighlighted = false;
+            for(int i=0; i<path.Count-1;i++)
+            {
+                isHighlighted |= (path[i].Id == link.StartNode.Id && path[i + 1].Id == link.EndNode.Id);
+            }
 
             if (link.StartNode.Id != link.EndNode.Id) // Lien normal
             {
@@ -349,7 +498,7 @@ namespace Cook_Eat
             if (graph.isWeighted)
             {
                 var midPoint = new PointF((start.X + end.X) / 2, (start.Y + end.Y) / 2);
-                graphics.DrawString(link.Weight.ToString(), new Font("Arial", 10), Brushes.Red, midPoint);
+                graphics.DrawString(link.Weight.ToString(), new Font("Arial", 15), Brushes.Red, midPoint);
             }
 
             // Ajoute une flèche si le graphe est orienté
@@ -367,7 +516,60 @@ namespace Cook_Eat
         {
             foreach (var node in graph.Nodes)
             {
-                nodeColors[node] = new SolidBrush(node.color); // Utilise la couleur de la ligne de métro du nœud
+                switch (node.Entity.Line)
+                {
+                    case 1:
+                        nodeColors[node] = new SolidBrush(Color.Yellow);
+                        break;
+                    case 2:
+                        nodeColors[node] = new SolidBrush(Color.Blue);
+                        break;
+                    case 3:
+                        nodeColors[node] = new SolidBrush(Color.Olive);
+                        break;
+                    case 31:
+                        nodeColors[node] = new SolidBrush(Color.LightGreen);
+                        break;
+                    case 4:
+                        nodeColors[node] = new SolidBrush(Color.Magenta);
+                        break;
+                    case 5:
+                        nodeColors[node] = new SolidBrush(Color.Orange);
+                        break;
+                    case 6:
+                        nodeColors[node] = new SolidBrush(Color.LightBlue);
+                        break;
+                    case 7:
+                        nodeColors[node] = new SolidBrush(Color.Pink);
+                        break;
+                    case 71:
+                        nodeColors[node] = new SolidBrush(Color.LightPink);
+                        break;
+                    case 8:
+                        nodeColors[node] = new SolidBrush(Color.Cyan);
+                        break;
+                    case 9:
+                        nodeColors[node] = new SolidBrush(Color.Lime);
+                        break;
+                    case 10:
+                        nodeColors[node] = new SolidBrush(Color.DarkGreen);
+                        break;
+                    case 11:
+                        nodeColors[node] = new SolidBrush(Color.Brown);
+                        break;
+                    case 12:
+                        nodeColors[node] = new SolidBrush(Color.DarkBlue);
+                        break;
+                    case 13:
+                        nodeColors[node] = new SolidBrush(Color.LightSlateGray);
+                        break;
+                    case 14:
+                        nodeColors[node] = new SolidBrush(Color.Purple);
+                        break;
+                    default:
+                        nodeColors[node] = new SolidBrush(Color.Black); // Couleur par défaut si la ligne n'est pas reconnue
+                        break;
+                }
             }
         }
 
@@ -377,6 +579,7 @@ namespace Cook_Eat
         /// </summary>
         /// <param name="start">Point de départ du lien.</param>
         /// <param name="end">Point d'arrivée du lien.</param>
+        /// <param name="startNode">Le noeud de départ de l'arc.</param>
         private void DrawArrowhead(PointF start, PointF end, Node<T> startNode)
         {
             float size = 6; // Taille de la flèche

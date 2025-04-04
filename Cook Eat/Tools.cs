@@ -1,73 +1,57 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using Cook_Eat.views;
 using Org.BouncyCastle.Asn1.X509;
 
 namespace Cook_Eat
 {
     public class Tools
     {
-        // <summary>
+        /// <summary>
         /// Méthode pour la création du réseau de métros.
         /// </summary>
-        public static void TransportNetwork()
+        /// <param name="model">Le modèle d'affichage à utiliser dans la fonction PathTest.</param>
+        public static void TransportNetwork(bool model)
         {
-            Graph<int> g = new Graph<int>(isDirected: true, isWeighted: true);
-            Dictionary<int, (double, double)> pos = ReadFileToHaveNodesPosition("../../../data/pos.txt");
-            List<Node<int>> nodes = ReadFileToCreateDetailedNodes("../../../data/stations.txt");
-            g.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", pos, nodes), nodes);
+            Graph<Station> TransportNetwork = new Graph<Station>(true, true);
+            List<Node<Station>> nodes = ReadFileToCreateStationNodes("../../../data/detailedStations.txt");
+            TransportNetwork.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", nodes), nodes);
 
             Console.WriteLine("Réseau des métros de Paris :\n");
+            Console.WriteLine(TransportNetwork.ToString()+"\n");
 
-            Console.WriteLine(g.ToString());
-
-            GraphVisualizer<int> visualizer = new GraphVisualizer<int>(g, false);
-            visualizer.Visualize("stations.png");
+            int source = int.Parse(ConsoleView.GetUserInput("ID du noeud de départ : "));
+            int target = int.Parse(ConsoleView.GetUserInput("ID du noeud d'arrivée : "));
+            PathTest(TransportNetwork, source, target, model);
         }
 
 
 
         /// <summary>
-        /// Lit un fichier texte pour le transformer en une liste de noeuds contenant 
-        /// des informations détaillées (groupes de noeuds, description des noeuds).
+        /// Lit un fichier texte pour le transformer en une liste de noeuds représentant 
+        /// des stations avec leurs informations détaillées (noms, lignes et positions).
         /// </summary>
         /// <param name="path">Chemin du fichier contenant les données.</param>
         /// <returns>Une liste contenant l'ensemble des noeuds créés.</returns>
-        public static List<Node<int>> ReadFileToCreateDetailedNodes(string path)
+        public static List<Node<Station>> ReadFileToCreateStationNodes(string path)
         {
             string[] lines = File.ReadAllLines(path);
-            List<Node<int>> nodes = [];
+            List<Node<Station>> nodes = [];
 
             for (int i = 0; i < lines.Length; i++)
             {
                 string[] parts = lines[i].Split(";");
                 int id = int.Parse(parts[0]);
-                string group = parts[1];
-                string description = parts[2];
-                Node<int> tmp = new Node<int>(id, group, description);
+                int line = int.Parse(parts[1]);
+                string name = parts[2];
+                double longitude = double.Parse(parts[3]);
+                double latitude = double.Parse(parts[4]);
+                Station station = new Station(name, line, longitude, latitude);
+                Node<Station> tmp = new Node<Station>(id, station);
                 nodes.Add(tmp);
             }
+
             return nodes;
-        }
-
-
-        /// <summary>
-        /// Lit un fichier texte pour le transformer en une collection qui associe à chaque
-        /// noeud (représenté par son id) ses coordonnées dans l'espace (longitude et latitude).
-        /// <param name="path">Chemin du fichier contenant les données.</param>
-        /// <returns>Un dictionnaire assiociant chaque noeud à sa position.</returns>
-        public static Dictionary<int,(double,double)> ReadFileToHaveNodesPosition(string path)
-        {
-            string[] lines = File.ReadAllLines(path);
-            Dictionary<int,(double,double)> pos = [];
-
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string[] parts = lines[i].Split(";");
-                int id = int.Parse(parts[0]);
-                double longitude = double.Parse(parts[1]);
-                double latitude = double.Parse(parts[2]);
-                pos[id] = (longitude, latitude);
-            }
-            return pos;
         }
 
 
@@ -82,12 +66,11 @@ namespace Cook_Eat
         /// <param name="pos">Dictionnaire des positions des stations.</param>
         /// <param name="nodes">Liste de toutes les noeuds représentant les stations.</param>
         /// <returns></returns>
-        private static int[,] ReadFileForNetworkAdjacencyMatrix(string path, Dictionary<int,(double,double)> pos, List<Node<int>> nodes)
+        public static int[,] ReadFileForNetworkAdjacencyMatrix(string path, List<Node<Station>> nodes)
         {
             string[] lines = File.ReadAllLines(path);
 
-            int size = pos.Keys.Count;
-            Console.WriteLine(size);
+            int size = nodes.Count;
             int[,] adjacencyMatrix = new int[size, size];
 
             for (int i = 0; i < lines.Length; i++)
@@ -97,8 +80,19 @@ namespace Cook_Eat
                 int left = int.Parse(parts[1]);
                 int right = int.Parse(parts[2]);
 
-                double sourceLong = pos[id].Item1;
-                double sourceLat = pos[id].Item2;
+                Node<Station> idN = null;
+                Node<Station> leftN = null;
+                Node<Station> rightN = null;
+
+                foreach (Node<Station> element in nodes)
+                {
+                    if (element.Id == id) { idN = element; }
+                    if (element.Id == left) { leftN = element; }
+                    if (element.Id == right) { rightN = element; }
+                }
+
+                double sourceLong = idN.Entity.Position.Item1;
+                double sourceLat = idN.Entity.Position.Item2;
 
                 double targetLong;
                 double targetLat;
@@ -107,24 +101,13 @@ namespace Cook_Eat
                 double dist;
                 int time;
 
-                Node<int> idN = null;
-                Node<int> leftN = null;
-                Node<int> rightN = null;
-                
-                foreach(Node<int> element in nodes)
-                {
-                    if (element.Id == id) { idN = element; }
-                    if (element.Id == left) { leftN = element; }
-                    if (element.Id == right) { rightN = element; }
-                }
-
                 if (left != -1)
                 {
-                    if (idN.Description == leftN.Description) { adjacencyMatrix[id - 1, left - 1] = 3; }
+                    if (idN.Entity.Name == leftN.Entity.Name) { adjacencyMatrix[id - 1, left - 1] = 3; }
                     else
                     {
-                        targetLong = pos[left].Item1;
-                        targetLat = pos[left].Item2;
+                        targetLong = leftN.Entity.Position.Item1;
+                        targetLat = leftN.Entity.Position.Item2;
                         difLong = (targetLong - sourceLong) * Math.PI / 180;
                         difLat = (targetLat - sourceLat) * Math.PI / 180;
                         dist = 2 * 6371 * Math.Asin(Math.Sqrt(Math.Sin(difLat / 2) * Math.Sin(difLat / 2) + Math.Cos(sourceLat * Math.PI / 180) *
@@ -136,11 +119,11 @@ namespace Cook_Eat
 
                 if (right != -1)
                 {
-                    if (idN.Description == rightN.Description) { adjacencyMatrix[id - 1, right - 1] = 3; }
+                    if (idN.Entity.Name == rightN.Entity.Name) { adjacencyMatrix[id - 1, right - 1] = 3; }
                     else
                     {
-                        targetLong = pos[right].Item1;
-                        targetLat = pos[right].Item2;
+                        targetLong = rightN.Entity.Position.Item1;
+                        targetLat = rightN.Entity.Position.Item2;
                         difLong = (targetLong - sourceLong) * Math.PI / 180;
                         difLat = (targetLat - sourceLat) * Math.PI / 180;
                         dist = 2 * 6371 * Math.Asin(Math.Sqrt(Math.Sin(difLat / 2) * Math.Sin(difLat / 2) + Math.Cos(sourceLat * Math.PI / 180) *
@@ -151,6 +134,38 @@ namespace Cook_Eat
                 }
             }
             return adjacencyMatrix;
+        }
+
+
+        /// <summary>
+        /// Méthode pour tester le calcul du plus court chemin possible entre deux stations de métro.
+        /// Cette méthode affiche également le chemin trouvé soit sur la carte soit tout seul pour une meilleure visibilité.
+        /// On peut choisir d'afficher le chemin seul avec le booléen model.
+        /// </summary>
+        /// <param name="graph">Le graphe utilisé du réseau de métros.</param>
+        /// <param name="source">Le noeud depuis lequel on part.</param>
+        /// <param name="target">Le noeud vers lequel on veut aller.</param>
+        /// <param name="model">Le modèle d'affichage : true pour le chemin seul, false pour la carte entière.</param>
+        public static void PathTest(Graph<Station> graph, int source, int target, bool model)
+        {
+            Node<Station> A = null;
+            Node<Station> B = null;
+            foreach (Node<Station> node in graph.Nodes)
+            {
+                if (node.Id == source) { A = node; }
+                if (node.Id == target) { B = node; }
+            }
+
+            (List<Node<Station>>, double) pathN = graph.ShortestPathFloyd(A, B);
+            List<Node<Station>> path = pathN.Item1;
+            Console.WriteLine("\nDistance totale : " + pathN.Item2 + "\nChemin :");
+            foreach (Node<Station> node in path)
+            {
+                Console.WriteLine(node.Entity.Name + " (" + node.Entity.Line + ")");
+            }
+
+            GraphVisualizer<Station> visualizer1 = new GraphVisualizer<Station>(graph, false, true, false);
+            visualizer1.Visualize("stations.png", path, model);
         }
     }
 }
