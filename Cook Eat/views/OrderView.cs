@@ -76,5 +76,27 @@ namespace Cook_Eat.views
                 ConsoleView.DisplayMessage("ID de commande invalide.");
             }
         }
+
+        // OrderView.cs
+        public void SimulateMetroPath()
+        {
+            try
+            {
+                Console.WriteLine("SIMULATION DE TRAJET MÉTRO");
+                Console.WriteLine("--------------------------\n");
+
+                string stationDepart = ConsoleView.GetUserInput("Station de départ : ");
+                string stationArrivee = ConsoleView.GetUserInput("Station d'arrivée : ");
+
+                // Appel direct à la méthode Tools avec les noms de stations
+                Tools.GenererTrajetParNoms(stationDepart, stationArrivee, true);
+
+                ConsoleView.DisplayMessage("\nTrajet généré avec succès !");
+            }
+            catch (Exception ex)
+            {
+                ConsoleView.DisplayMessage($"Erreur : {ex.Message}");
+            }
+        }
     }
 }

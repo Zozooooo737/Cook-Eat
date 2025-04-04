@@ -212,7 +212,7 @@ namespace Cook_Eat
 
             // Calcul et affichage du trajet
             Console.WriteLine($"\nTrajet de {stationDepart} à {stationArrivee} :");
-            (List<Node<Station>>, double) pathN = TransportNetwork.ShortestPathFloyd(departNode, arriveeNode);
+            (List<Node<Station>>, double) pathN = TransportNetwork.ShortestPath(departNode, arriveeNode, 1);
             List<Node<Station>> path = pathN.Item1;
     
             Console.WriteLine($"\nDistance totale : {pathN.Item2} minutes");

@@ -14,6 +14,7 @@ namespace Cook_Eat.views
                 "Créer une nouvelle commande",
                 "Afficher le prix d'une commande",
                 "Simuler le chemin de livraison",
+                "Simuler un trajet entre deux stations de métro",
                 "Retour au menu principal"
             };
 
@@ -37,6 +38,9 @@ namespace Cook_Eat.views
                         _orderView.ShowDeliveryPath();
                         break;
                     case 3:
+                        _orderView.SimulateMetroPath();
+                        break;
+                    case 4:
                         return;
                 }
                 ConsoleView.WaitForContinue();
