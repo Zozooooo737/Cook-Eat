@@ -1,6 +1,7 @@
 ﻿using Cook_Eat.services;
+using Cook_Eat.views;
 
-namespace Cook_Eat.views
+namespace Cook_Eat.modules
 {
     public static class StatsModule
     {

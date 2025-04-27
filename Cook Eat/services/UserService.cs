@@ -1,4 +1,5 @@
 ﻿using Cook_Eat.models;
+using Cook_Eat.interfaces;
 using MySql.Data.MySqlClient;
 
 namespace Cook_Eat.services
@@ -10,6 +11,13 @@ namespace Cook_Eat.services
         public UserService(DatabaseService databaseService)
         {
             _databaseService = databaseService;
+        }
+
+        public List<Dictionary<string,object>> Connexion(string param, string password)
+        {
+            string query = $@"SELECT user_id FROM user_account
+                WHERE user_id = {param} AND password = '{password}'";
+            return _databaseService.ExecuteQuery(query);
         }
 
         public void CreateUser(UserAccount user)
@@ -27,6 +35,36 @@ namespace Cook_Eat.services
             };
 
             _databaseService.ExecuteNonQuery(query, parameters);
+        }
+
+        public List<Dictionary<string, object>> GetUser(int id)
+        {
+            string query = $@"SELECT 
+                        u.user_id as 'ID',
+                        u.first_name as 'Prénom',
+                        u.last_name as 'Nom',
+                        u.email as 'Email',
+                        u.phone_number as 'Numéro',
+                        CASE WHEN is_business THEN 'Entreprise' ELSE 'Particulier' END as 'Type'
+                      FROM user_account AS u
+                      JOIN client AS c ON u.user_id = c.user_id
+                      WHERE c.client_id = {id}";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public List<Dictionary<string, object>> GetUserClientId()
+        {
+            string query = $@"SELECT client_id FROM client WHERE user_id = {UserInterface.currentId}";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public List<Dictionary<string, object>> GetUserCookId()
+        {
+            string query = $@"SELECT cook_id FROM cook WHERE user_id = {UserInterface.currentId}";
+
+            return _databaseService.ExecuteQuery(query);
         }
 
         public List<Dictionary<string, object>> GetUsersSorted(string orderBy = "last_name", bool ascending = true)

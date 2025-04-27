@@ -25,6 +25,22 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteNonQuery(query, parameters);
         }
 
+        public List<Dictionary<string, object>> GetClient(int id)
+        {
+            string query = $@"
+                SELECT 
+                    c.client_id as 'ID',
+                    u.user_id as 'User ID',
+                    u.first_name as 'Prénom',
+                    u.last_name as 'Nom',
+                    u.email as 'Email'
+                FROM client c
+                JOIN user_account u ON c.user_id = u.user_id
+                WHERE c.client_id = {id}";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
         public List<Dictionary<string, object>> GetClientsSorted(string orderBy, bool ascending = true)
         {
             string direction = ascending ? "ASC" : "DESC";

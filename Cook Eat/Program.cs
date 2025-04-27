@@ -1,8 +1,10 @@
-﻿using Cook_Eat.services;
+﻿using Cook_Eat.interfaces;
+using Cook_Eat.services;
 using Cook_Eat.views;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using Cook_Eat.views;
 
 namespace Cook_Eat
 {
@@ -21,7 +23,7 @@ namespace Cook_Eat
         {
             Console.Title = "Cook-Eat - Livraison de repas entre voisins";
             Console.ForegroundColor = ConsoleColor.White;
-            MainModule.Show();
+            MainInterface.Show();
         }
     }
     

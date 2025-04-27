@@ -1,6 +1,8 @@
 ﻿using Cook_Eat.models;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System.Collections.Generic;
+using static Mysqlx.Crud.Order.Types;
 
 namespace Cook_Eat.services
 {
@@ -74,6 +76,16 @@ namespace Cook_Eat.services
                         ORDER BY dish_name";
 
             return _databaseService.ExecuteQuery(query);
+        }
+
+        public bool SwitchDishStatus(int id)
+        {
+            string query = $@"UPDATE 
+                            dish_preparation
+                        SET is_published = FALSE
+                        WHERE preparation_id = {id}";
+
+            return _databaseService.ExecuteNonQuery(query);
         }
     }
 }

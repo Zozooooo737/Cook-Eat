@@ -1,10 +1,36 @@
-﻿namespace Cook_Eat.views
+﻿using Cook_Eat.views;
+using Cook_Eat.modules;
+
+namespace Cook_Eat.interfaces
 {
-    public static class MainModule
+    public static class AdminInterface
     {
+        public static void Connexion()
+        {
+            Console.Clear();
+
+            ConsoleView.ShowMenuTitle("CONNEXION ADMIN");
+
+            string adminUsername = ConsoleView.GetUserInput("Identifiant Admin : ");
+            string adminPassword = ConsoleView.GetUserInput("Mot de passe Admin : ");
+            if (adminUsername == "admin" && adminPassword == "Adm1n")
+            {
+                Console.WriteLine();
+                ConsoleView.DisplayMessage("Connexion Admin établie");
+                ConsoleView.WaitForContinue();
+                Show();
+            }
+            else
+            {
+                Console.WriteLine();
+                ConsoleView.DisplayMessage("Échec de la connexion");
+                ConsoleView.WaitForContinue();
+            }
+        }
+
         public static void Show()
         {
-            string[] mainMenuOptions = {
+            string[] adminMenuOptions = {
                 "Module Utilisateurs",
                 "Module Clients",
                 "Module Cuisiniers",
@@ -18,7 +44,7 @@
             {
                 Console.Clear();
 
-                int choice = ConsoleView.ShowMenu("MENU PRINCIPAL", mainMenuOptions);
+                int choice = ConsoleView.ShowMenu("MENU ADMIN", adminMenuOptions);
 
                 switch (choice)
                 {

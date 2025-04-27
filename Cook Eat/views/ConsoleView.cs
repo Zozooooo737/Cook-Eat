@@ -13,7 +13,12 @@
             return Console.ReadLine();
         }
 
-        public static int ShowMenu(string title, string[] options)
+        public static void ShowMenuTitle(string title)
+        {
+            Console.WriteLine("=== " + title + " ===");
+            Console.WriteLine();
+        }
+        public static int ShowMenu(string title, string[] options = null)
         {
             int selectedIndex = 0;
             int size = options.Length;

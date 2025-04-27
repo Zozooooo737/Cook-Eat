@@ -122,3 +122,7 @@ CREATE TABLE is_favorite(
    FOREIGN KEY(client_id) REFERENCES client(client_id) ON DELETE CASCADE,
    FOREIGN KEY(cook_id) REFERENCES cook(cook_id) ON DELETE CASCADE
 );
+
+SELECT user_id FROM user_account WHERE password = 'hugo';
+
+SELECT client_id FROM client WHERE user_id = 51;

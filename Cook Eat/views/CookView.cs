@@ -1,6 +1,8 @@
 ﻿
 using Cook_Eat.models;
 using Cook_Eat.services;
+using Cook_Eat.interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Cook_Eat.views
 {
@@ -13,35 +15,65 @@ namespace Cook_Eat.views
             _cookService = cookService;
         }
 
-        public void CreateCook()
+        public void CreateCook(bool adminMode = true)
         {
+            ConsoleView.ShowMenuTitle("CRÉATION DU PROFIL CUISINIER");
+
             try
             {
-                int userId = int.Parse(ConsoleView.GetUserInput("ID utilisateur existant à associer : "));
-                string username = ConsoleView.GetUserInput("Nom d'utilisateur cuisinier : ");
-
-                var cook = new Cook
+                if (adminMode)
                 {
-                    UserId = userId,
-                    CookUsername = username
-                };
+                    int userId = int.Parse(ConsoleView.GetUserInput("ID utilisateur existant à associer : "));
+                    string username = ConsoleView.GetUserInput("Nom d'utilisateur cuisinier : ");
 
-                if (_cookService.CreateCook(cook))
-                {
-                    ConsoleView.DisplayMessage("Compte cuisinier créé avec succès !");
+                    var cook = new Cook
+                    {
+                        UserId = userId,
+                        CookUsername = username
+                    };
+
+                    if (_cookService.CreateCook(cook))
+                    {
+                        ConsoleView.DisplayMessage("Compte cuisinier créé avec succès !");
+                    }
+                    else
+                    {
+                        ConsoleView.DisplayMessage("Échec de la création du compte cuisinier.");
+                    }
                 }
                 else
                 {
-                    ConsoleView.DisplayMessage("Échec de la création du compte cuisinier.");
+                    string username = ConsoleView.GetUserInput("Entrez votre nom d'utilisateur Cuisinier : ");
+
+                    var cook = new Cook
+                    {
+                        UserId = UserInterface.currentId,
+                        CookUsername = username
+                    };
+
+                    if (_cookService.CreateCook(cook))
+                    {
+                        ConsoleView.DisplayMessage("Compte cuisinier créé avec succès !");
+                    }
+                    else
+                    {
+                        ConsoleView.DisplayMessage("Échec de la création du compte cuisinier.");
+                    }
                 }
             }
             catch (FormatException)
             {
-                ConsoleView.DisplayMessage("ID client invalide.");
+                ConsoleView.DisplayMessage("ID utilisateur invalide.");
             }
         }
 
-        public void DisplayClients()
+        public int GetLastCookId()
+        {
+            List<Dictionary<string, object>> data = _cookService.GetCookSorted("c.cook_id", false);
+            return Convert.ToInt32(data[0]["ID"]);
+        }
+
+        public void DisplayCook()
         {
             string[] menuOptions = {
                 "Par ID client (<)",
@@ -66,11 +98,11 @@ namespace Cook_Eat.views
                 switch (choice)
                 {
                     case 0:
-                        data = _cookService.GetCookSorted("c.client_id", true);
+                        data = _cookService.GetCookSorted("c.cook_id", true);
                         title = "CLIENTS PAR ID (<)";
                         break;
                     case 1:
-                        data = _cookService.GetCookSorted("c.client_id", false);
+                        data = _cookService.GetCookSorted("c.cook_id", false);
                         title = "CLIENTS PAR ID (>)";
                         break;
                     case 2:
@@ -97,6 +129,22 @@ namespace Cook_Eat.views
                 ConsoleView.DisplayDataWithChoice(data, title);
                 ConsoleView.WaitForContinue();
             }
+        }
+
+        public void DisplayFavoriteCook(int id)
+        {
+            List<Dictionary<string, object>> data = _cookService.GetFavoriteCook(id);
+            string title = "CUISINIERS FAVORIS DU CLIENT D'ID "+id;
+            ConsoleView.DisplayDataWithChoice(data, title);
+            ConsoleView.WaitForContinue();
+        }
+
+        public void DisplayCookDishes(int id)
+        {
+            List<Dictionary<string, object>> data = _cookService.GetFavoriteCook(id);
+            string title = "CUISINIERS FAVORIS DU CLIENT D'ID " + id;
+            ConsoleView.DisplayDataWithChoice(data, title);
+            ConsoleView.WaitForContinue();
         }
 
         public void ShowClientsServed()

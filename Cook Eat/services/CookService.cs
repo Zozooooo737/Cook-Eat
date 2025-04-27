@@ -43,6 +43,17 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteQuery(query);
         }
 
+        public List<Dictionary<string, object>> GetFavoriteCook(int id)
+        {
+            string query = $@"
+                SELECT 
+                    cook_id as 'ID',
+                FROM is_favorite
+                WHERE client_id = {id}";
+            
+            return _databaseService.ExecuteQuery(query);
+        }
+
         public List<Dictionary<string, object>> GetClientsServed(int cookId, DateTime? startDate = null, DateTime? endDate = null)
         {
             string query = @"

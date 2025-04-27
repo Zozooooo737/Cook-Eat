@@ -1,5 +1,6 @@
 ﻿using Cook_Eat.models;
 using MySql.Data.MySqlClient;
+using Mysqlx.Crud;
 using System.Collections.Generic;
 
 namespace Cook_Eat.services
@@ -13,7 +14,7 @@ namespace Cook_Eat.services
             _databaseService = databaseService;
         }
 
-        public bool CreateOrder(Order order)
+        public bool CreateOrder(models.Order order)
         {
             string query = @"INSERT INTO client_order (order_date, transaction_id, address_id, preparation_id) 
                             VALUES (@OrderDate, @TransactionId, @AddressId, @PreparationId)";
@@ -26,6 +27,35 @@ namespace Cook_Eat.services
             };
 
             return _databaseService.ExecuteNonQuery(query, parameters);
+        }
+
+        public bool CreateTransaction(Transaction transaction)
+        {
+            string query = @"INSERT INTO client_transaction (transaction_id, order_date, amount, is_delivered, client_id) 
+                            VALUES (@TransactionId, @OrderDate, @Amount, @IsDelivered, @ClientId)";
+
+            MySqlParameter[] parameters = {
+                new MySqlParameter("@TransactionId", transaction.TransactionId),
+                new MySqlParameter("@OrderDate", transaction.OrderDate),
+                new MySqlParameter("@Amount", transaction.Amount),
+                new MySqlParameter("@IsDelivered", transaction.IsDelivered),
+                new MySqlParameter("@ClientId", transaction.ClientId)
+            };
+
+            return _databaseService.ExecuteNonQuery(query, parameters);
+        }
+
+        public Dictionary<string, object> GetLastTransaction()
+        {
+            string query = @"
+                SELECT 
+                    transaction_id
+                FROM client_transaction
+                ORDER BY transaction_id DESC"
+            ;
+
+            var result = _databaseService.ExecuteQuery(query);
+            return result[0];
         }
 
         public decimal CalculateOrderPrice(int orderId)

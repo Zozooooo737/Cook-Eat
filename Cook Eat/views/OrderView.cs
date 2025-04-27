@@ -8,21 +8,24 @@ namespace Cook_Eat.views
     {
         private readonly OrderService _orderService;
         private readonly ClientService _clientService;
+        private readonly DishService _dishService;
 
-        public OrderView(OrderService orderService, ClientService clientService)
+        public OrderView(OrderService orderService, ClientService clientService, DishService dishService)
         {
             _orderService = orderService;
             _clientService = clientService;
+            _dishService = dishService;
         }
 
-        public void CreateOrder()
+        public void CreateOrderLine(int id = -1, int idT = -1)
         {
             try
             {
                 // Vérifier si le client existe
                 int clientId = int.Parse(ConsoleView.GetUserInput("ID du client : "));
-
-                int transactionId = int.Parse(ConsoleView.GetUserInput("ID de la transaction : "));
+                int transactionId;
+                if (idT == -1) { transactionId = int.Parse(ConsoleView.GetUserInput("ID de la transaction : ")); }
+                else { transactionId = idT; }
                 int addressId = int.Parse(ConsoleView.GetUserInput("ID de l'adresse de livraison : "));
                 int preparationId = int.Parse(ConsoleView.GetUserInput("ID de la préparation commandée : "));
 
@@ -34,7 +37,7 @@ namespace Cook_Eat.views
                     PreparationId = preparationId
                 };
 
-                if (_orderService.CreateOrder(order))
+                if (_orderService.CreateOrder(order) && _dishService.SwitchDishStatus(preparationId))
                 {
                     ConsoleView.DisplayMessage("Commande créée avec succès !");
                 }
@@ -47,6 +50,68 @@ namespace Cook_Eat.views
             {
                 ConsoleView.DisplayMessage("Données invalides.");
             }
+        }
+
+        public void CreateTransaction(int id = -1)
+        {
+            try
+            {
+                int clientId;
+                if (id == -1) { clientId = int.Parse(ConsoleView.GetUserInput("ID du client : ")); }
+                else { clientId = id; }
+
+                var transaction = new Transaction
+                {
+                    OrderDate = DateTime.Now,
+                    Amount = 0,
+                    IsDelivered = false,
+                    ClientId = id
+                };
+
+                _orderService.CreateTransaction(transaction);
+            }
+            catch (FormatException)
+            {
+                ConsoleView.DisplayMessage("Données invalides.");
+            }
+        }
+
+        public void CreateOrder(int id = -1)
+        {
+            CreateTransaction(id);
+            int idT = GetLastTransactionId();
+            double amount;
+
+            string[] menuOptions = {
+                "Ajouter une ligne de commande",
+                "Valider la commande",
+            };
+
+            while (true)
+            {
+                Console.Clear();
+
+                int choice = ConsoleView.ShowMenu("MODULE COMMANDES", menuOptions);
+
+                Console.Clear();
+
+                switch (choice)
+                {
+                    case 0:
+                        CreateOrderLine(id, idT);
+                        break;
+                    case 1:
+                        
+                        return;
+                }
+                ConsoleView.WaitForContinue();
+            }
+        }
+
+        public int GetLastTransactionId()
+        {
+            Dictionary<string, object> data = _orderService.GetLastTransaction();
+            return Convert.ToInt32(data["transaction_id"]);
         }
 
         public void ShowOrderPrice()
