@@ -78,6 +78,34 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteQuery(query);
         }
 
+        public Dictionary<int, Tuple<int, int>> GetTransactionClientCook()
+        {
+            string query = @" SELECT 
+                    t.transaction_id,
+                    c.client_id,
+                    d.cook_id
+                FROM client_transaction t
+                JOIN client_order o ON t.transaction_id = o.transaction_id
+                JOIN client c ON t.client_id = c.client_id
+                JOIN dish_preparation p ON o.preparation_id = p.preparation_id
+                JOIN dish d ON p.dish_id = d.dish_id";
+
+            var results = _databaseService.ExecuteQuery(query);
+
+            var transactionClientCook = new Dictionary<int, Tuple<int, int>>();
+
+            foreach (var row in results)
+            {
+                int transactionId = Convert.ToInt32(row["transaction_id"]);
+                int clientId = Convert.ToInt32(row["client_id"]);
+                int cookId = Convert.ToInt32(row["cook_id"]);
+
+                transactionClientCook[transactionId] = Tuple.Create(clientId, cookId);
+            }
+
+            return transactionClientCook;
+        }
+
         public bool SwitchDishStatus(int id)
         {
             string query = $@"UPDATE 
