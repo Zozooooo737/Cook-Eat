@@ -612,6 +612,40 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Récupère la liste des entités voisines d'un nœud donné dans le graphe.
+        /// </summary>
+        /// <param name="entity">L'entité pour laquelle on souhaite obtenir les voisins.</param>
+        /// <returns>
+        /// Une liste des entités directement connectées à <paramref name="entity"/> via des liens du graphe.
+        /// Si le nœud n'existe pas dans le graphe, une liste vide est retournée.
+        /// </returns>
+        /// <remarks>
+        /// Si le graphe est orienté (<c>isDirected == true</c>), seuls les liens sortants sont pris en compte.
+        /// Si le graphe est non orienté, les voisins sont détectés indépendamment de la direction des liens.
+        /// </remarks>
+        public List<T> Voisins(T entity)
+        {
+            Node<T> node = Nodes.FirstOrDefault(n => EqualityComparer<T>.Default.Equals(n.Entity, entity));
+            if (node == null) return new List<T>();
+
+            var neighbors = new List<T>();
+
+            foreach (var link in Links)
+            {
+                if (link.StartNode.Equals(node))
+                {
+                    neighbors.Add(link.EndNode.Entity);
+                }
+                else if (!isDirected && link.EndNode.Equals(node))
+                {
+                    neighbors.Add(link.StartNode.Entity);
+                }
+            }
+
+            return neighbors;
+        }
+
+        /// <summary>
         /// Retourne une description textuelle du graphe.
         /// Inclut des informations sur l'orientation, la pondération, l'ordre, la taille,
         /// la connexité, la présence de cycles, ainsi que les parcours DFS et BFS.

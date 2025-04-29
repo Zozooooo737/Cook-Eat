@@ -37,6 +37,7 @@ namespace Cook_Eat.interfaces
                 "Module Plats",
                 "Module Commandes",
                 "Module Statistiques",
+                "Module Coloration des transactions",
                 "Quitter l'application"
             };
 
@@ -67,6 +68,9 @@ namespace Cook_Eat.interfaces
                         StatsModule.Show();
                         break;
                     case 6:
+                        ColorationModule.Show();
+                        break;
+                    case 7:
                         Console.WriteLine("\nMerci d'avoir utilisé Cook'Eat. À bientôt !");
                         return;
                 }

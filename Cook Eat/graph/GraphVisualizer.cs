@@ -73,7 +73,7 @@ namespace Cook_Eat
         /// <param name="useRegularPositioning">True pour positionner les nœuds en cercle, False pour un positionnement aléatoire.</param>
         /// <param name="width">Largeur de l'image.</param>
         /// <param name="height">Hauteur de l'image.</param>
-        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning, bool useMetroPositioning, bool useHorizontalPositioning, int width = 1600, int height = 1200)
+        public GraphVisualizer(Graph<T> graph, bool useRegularPositioning, bool useMetroPositioning, bool useHorizontalPositioning,bool useWelshPowellColors, int width = 1600, int height = 1200)
         {
             this.graph = graph;
             if (useHorizontalPositioning) { this.width = 3500; }
@@ -92,6 +92,10 @@ namespace Cook_Eat
             if (useMetroPositioning || useHorizontalPositioning)
             {
                 AssignMetroLineColors(); // Attribue les couleurs des lignes de métro
+            }
+            else if(useWelshPowellColors)
+            {
+                WelshPowellColors(graph);
             }
             else
             {
@@ -113,7 +117,7 @@ namespace Cook_Eat
                 foreach(Node<T> element in path) { if (!nodes.Contains(element)) { nodes.Add(element); }
                 }
                 Graph<T> tmp = new Graph<T>(graph, nodes);
-                GraphVisualizer<T> visualizer = new GraphVisualizer<T>(tmp, false, false, true, 3000);
+                GraphVisualizer<T> visualizer = new GraphVisualizer<T>(tmp, false, false, true, false);
                 visualizer.Visualize("stations.png", path, false);
             }
             else
@@ -461,7 +465,7 @@ namespace Cook_Eat
                 isHighlighted |= (path[i].Id == link.StartNode.Id && path[i + 1].Id == link.EndNode.Id);
             }
 
-            if (link.StartNode.Id != link.EndNode.Id) // Lien normal
+            if (link.StartNode.Id != link.EndNode.Id)
             {
                 if (isHighlighted)
                 {
@@ -575,6 +579,62 @@ namespace Cook_Eat
 
 
         /// <summary>
+        /// Applique l'algorithme de Welsh-Powell pour colorier les nœuds d'un graphe en minimisant le nombre de couleurs.
+        /// </summary>
+        /// <typeparam name="T">Le type des entités contenues dans les nœuds du graphe.</typeparam>
+        /// <param name="graph">Le graphe à colorier.</param>
+        /// <returns>
+        /// Un dictionnaire associant chaque entité du graphe à un entier représentant sa couleur.
+        /// Les entités adjacentes reçoivent des couleurs différentes.
+        /// </returns>
+        /// <remarks>
+        /// L'algorithme trie d'abord les nœuds par degré décroissant (nombre de voisins),
+        /// puis assigne les couleurs de façon gloutonne en évitant les conflits de couleur avec les voisins.
+        /// Cette méthode ne garantit pas le nombre minimal de couleurs (NP-difficile), mais fournit une bonne approximation.
+        /// </remarks>
+        public static Dictionary<T, int> WelshPowellColors<T>(Graph<T> graph)
+        {
+            // 1. Trier les sommets du graphe par nombre de voisins décroissant
+            var sommets = graph.Nodes
+                .OrderByDescending(node => graph.Voisins(node.Entity).Count)
+                .Select(node => node.Entity)
+                .ToList();
+
+            var couleurs = new Dictionary<T, int>();
+            int couleurActuelle = 1;
+
+            while (sommets.Any())
+            {
+                var aColorier = new List<T>();
+
+                foreach (var sommet in sommets)
+                {
+                    // Vérifie s'il n'y a pas de conflit de couleur avec ses voisins
+                    bool aucunConflit = graph.Voisins(sommet)
+                        .All(voisin => !couleurs.ContainsKey(voisin) || couleurs[voisin] != couleurActuelle);
+
+                    if (aucunConflit)
+                    {
+                        couleurs[sommet] = couleurActuelle;
+                        aColorier.Add(sommet);
+                    }
+                }
+
+                // Retire les sommets colorés du traitement
+                foreach (var sommet in aColorier)
+                {
+                    sommets.Remove(sommet);
+                }
+
+                couleurActuelle++;
+            }
+
+            return couleurs;
+        }
+
+
+
+        /// <summary>
         /// Dessine une flèche (carré) à l'extrémité d'un lien orienté.
         /// </summary>
         /// <param name="start">Point de départ du lien.</param>
@@ -610,6 +670,7 @@ namespace Cook_Eat
         {
             return (float)Math.Sqrt(Math.Pow(a.X - b.X, 2) + Math.Pow(a.Y - b.Y, 2));
         }
+
 
 
         /// <summary>

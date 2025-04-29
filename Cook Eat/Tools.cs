@@ -164,7 +164,7 @@ namespace Cook_Eat
                 Console.WriteLine(node.Entity.Name + " (" + node.Entity.Line + ")");
             }
 
-            GraphVisualizer<Station> visualizer1 = new GraphVisualizer<Station>(graph, false, true, false);
+            GraphVisualizer<Station> visualizer1 = new GraphVisualizer<Station>(graph, false, true, false, false);
             visualizer1.Visualize("stations.png", path, model);
         }
 
@@ -232,7 +232,7 @@ namespace Cook_Eat
             }
 
             // Visualisation graphique
-            GraphVisualizer<Station> visualizer = new GraphVisualizer<Station>(TransportNetwork, false, true, false);
+            GraphVisualizer<Station> visualizer = new GraphVisualizer<Station>(TransportNetwork, false, true, false, false);
             visualizer.Visualize("trajet.png", path, model);
             Console.WriteLine("\nVisualisation du trajet sauvegardée dans 'trajet.png'");
         }
