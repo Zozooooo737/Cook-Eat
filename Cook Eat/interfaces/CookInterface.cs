@@ -14,14 +14,11 @@ namespace Cook_Eat.interfaces
 
         public static void Show()
         {
-            
             string[] cookMenuOptions = {
-                "Module Utilisateur",
-                "Module Client",
-                "Module Cuisiniers",
-                "Module Plats",
-                "Module Commandes",
-                "Module Statistiques",
+                "Gérer mon profil Cuisinier",
+                "Mes Plats",
+                "Mes Commandes",
+                "Mes Statistiques",
                 "Quitter le profil"
             };
 
@@ -29,29 +26,23 @@ namespace Cook_Eat.interfaces
             {
                 Console.Clear();
 
-                int choice = ConsoleView.ShowMenu("MENU CUISINIER", cookMenuOptions);
+                int choice = ConsoleView.ShowMenu("MON COMPTE CUISINIER", cookMenuOptions);
 
                 switch (choice)
                 {
                     case 0:
-                        UserModule.Show(1, currentId);
+                        CookModule.Show(2, currentId);
                         break;
                     case 1:
-                        ClientModule.Show(1, currentId);
+                        DishModule.Show(2, currentId);
                         break;
                     case 2:
-                        CookModule.Show(1, currentId);
+                        OrderModule.Show(2, currentId);
                         break;
                     case 3:
-                        DishModule.Show(1);
+                        StatsModule.Show(2, currentId);
                         break;
                     case 4:
-                        OrderModule.Show();
-                        break;
-                    case 5:
-                        StatsModule.Show();
-                        break;
-                    case 6:
                         Console.WriteLine("\nMerci d'avoir utilisé Cook'Eat. À bientôt !");
                         return;
                 }

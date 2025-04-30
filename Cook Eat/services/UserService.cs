@@ -13,10 +13,20 @@ namespace Cook_Eat.services
             _databaseService = databaseService;
         }
 
-        public List<Dictionary<string,object>> Connexion(string param, string password)
+        public List<Dictionary<string,object>> Connexion(int method, string param, string password)
         {
-            string query = $@"SELECT user_id FROM user_account
+            string query = null;
+            switch(method)
+            {
+                case 1:
+                    query = $@"SELECT user_id FROM user_account
+                WHERE email = '{param}' AND password = '{password}'";
+                    break;
+                default:
+                    query = $@"SELECT user_id FROM user_account
                 WHERE user_id = {param} AND password = '{password}'";
+                    break;
+            }
             return _databaseService.ExecuteQuery(query);
         }
 
@@ -40,15 +50,14 @@ namespace Cook_Eat.services
         public List<Dictionary<string, object>> GetUser(int id)
         {
             string query = $@"SELECT 
-                        u.user_id as 'ID',
-                        u.first_name as 'Prénom',
-                        u.last_name as 'Nom',
-                        u.email as 'Email',
-                        u.phone_number as 'Numéro',
+                        user_id as 'ID',
+                        first_name as 'Prénom',
+                        last_name as 'Nom',
+                        email as 'Email',
+                        phone_number as 'Numéro',
                         CASE WHEN is_business THEN 'Entreprise' ELSE 'Particulier' END as 'Type'
-                      FROM user_account AS u
-                      JOIN client AS c ON u.user_id = c.user_id
-                      WHERE c.client_id = {id}";
+                      FROM user_account
+                      WHERE user_id = {id}";
 
             return _databaseService.ExecuteQuery(query);
         }
@@ -153,8 +162,39 @@ namespace Cook_Eat.services
             string query = "DELETE FROM user_account WHERE user_id = @UserId;";
             MySqlParameter[] parameters = { new MySqlParameter("@UserId", userId) };
 
-            return _databaseService.ExecuteNonQuery(query, parameters); ;
+            return _databaseService.ExecuteNonQuery(query, parameters);
         }
 
+        public bool AddAddress(Address address)
+        {
+            string query = $@"INSERT INTO address (street_number, street_address, city, postcode, nearest_metro_station, user_id)
+                           VALUES ( {address.StreetNumber},
+                                    '{address.StreetAddress}',
+                                    '{address.City}',
+                                    '{address.Postcode}',
+                                    '{address.NearestMetroStation}',
+                                    {address.UserId})";
+
+            return _databaseService.ExecuteNonQuery(query);
+        }
+
+        public List<Dictionary<string, object>> GetAddresses(int id)
+        {
+            string query = $@"
+                SELECT 
+                    CONCAT(street_number, ' ', street_address, ', ',postcode, ' ',city) AS 'Adresse',
+                    address_id as 'ID'
+                FROM address
+                WHERE user_id = {id}";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public bool DeleteAddress(int id)
+        {
+            string query = $@"DELETE FROM address WHERE address_id = {id}";
+
+            return _databaseService.ExecuteNonQuery(query);
+        }
     }
 }

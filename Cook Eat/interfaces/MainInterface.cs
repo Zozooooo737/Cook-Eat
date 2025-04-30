@@ -10,7 +10,7 @@ namespace Cook_Eat.interfaces
 {
     internal class MainInterface
     {
-        public static int id;
+        public static Graph<Station> Graph;
 
         public static void Show()
         {

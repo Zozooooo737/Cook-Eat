@@ -10,10 +10,10 @@ namespace Cook_Eat.modules
         private static readonly UserService _userService = Program.UserService;
         private static readonly UserView _userView = new UserView(_userService);
 
-        public static void Show(int index = 0, int id = -1)
+        public static void Show(bool adminMode = true)
         {
             string[] menuOptions = null;
-            if (index == 0)
+            if (adminMode)
             {
                 string[] tmp = {
                 "Créer un utilisateur",
@@ -24,11 +24,14 @@ namespace Cook_Eat.modules
                 };
                 menuOptions = tmp;
             }
-            if (index == 1)
+            else
             {
                 string[] tmp = {
                 "Afficher mon compte utilisateur",
                 "Modifier mon compte utilisateur",
+                "Ajouter une adresse",
+                "Afficher toutes mes adresses",
+                "Supprimer une adresse",
                 "Retour au menu principal"
                 };
                 menuOptions = tmp;
@@ -37,10 +40,14 @@ namespace Cook_Eat.modules
             while (true)
             {
                 Console.Clear();
-                int choice = ConsoleView.ShowMenu("MODULE UTILISATEURS", menuOptions);
+
+                int choice;
+                if (adminMode) choice = ConsoleView.ShowMenu("MODULE UTILISATEUR", menuOptions);
+                else choice = ConsoleView.ShowMenu("MON PROFIL UTILISATEUR", menuOptions);
 
                 Console.Clear();
-                if (index == 0)
+
+                if (adminMode)
                 {
                     switch (choice)
                     {
@@ -60,17 +67,28 @@ namespace Cook_Eat.modules
                             return;
                     }
                 }
-                if (index == 1)
+                else
                 {
+                    int userId = UserInterface.currentId;
+
                     switch (choice)
                     {
                         case 0:
-                            _userView.DisplayUsers(id);
+                            _userView.DisplayUsers(userId);
                             break;
                         case 1:
-                            _userView.UpdateUser(id);
+                            _userView.UpdateUser(userId);
                             break;
                         case 2:
+                            _userView.AddAddress(userId);
+                            break;
+                        case 3:
+                            _userView.GetAddresses(userId);
+                            break;
+                        case 4:
+                            _userView.DeleteAddress(userId);
+                            break;
+                        case 5:
                             return;
                     }
                 }
@@ -81,12 +99,14 @@ namespace Cook_Eat.modules
         public static void Connexion()
         {
             string[] menuOptions = {
+                "Connexion avec EMAIL et MOT DE PASSE",
                 "Connexion avec ID et MOT DE PASSE",
                 "Retour au menu de connexion"
             };
 
             bool connected = false;
             int userId = -1;
+            string email = null;
 
             while (!connected)
             {
@@ -98,11 +118,19 @@ namespace Cook_Eat.modules
                 {
                     case 0:
                         ConsoleView.ShowMenuTitle("CONNEXION UTILISATEUR");
-                        userId = _userView.Connexion();
+                        userId = _userView.Connexion(1);
+                        Console.WriteLine();
                         if (userId != -1) { ConsoleView.DisplayMessage("Connexion Utilisateur établie !"); connected = true; }
                         else ConsoleView.DisplayMessage("Échec de la connexion : identifiants invalides.");
                         break;
                     case 1:
+                        ConsoleView.ShowMenuTitle("CONNEXION UTILISATEUR");
+                        userId = _userView.Connexion(2);
+                        Console.WriteLine();
+                        if (userId != -1) { ConsoleView.DisplayMessage("Connexion Utilisateur établie !"); connected = true; }
+                        else ConsoleView.DisplayMessage("Échec de la connexion : identifiants invalides.");
+                        break;
+                    case 2:
                         return;
                 }
                 ConsoleView.WaitForContinue();

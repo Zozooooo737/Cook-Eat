@@ -2,13 +2,14 @@
 using MySql.Data.MySqlClient;
 using Mysqlx.Crud;
 using System.Collections.Generic;
+using System.Transactions;
 
 namespace Cook_Eat.services
 {
     public class OrderService
     {
         private readonly DatabaseService _databaseService;
-
+        
         public OrderService(DatabaseService databaseService)
         {
             _databaseService = databaseService;
@@ -29,7 +30,7 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteNonQuery(query, parameters);
         }
 
-        public bool CreateTransaction(Transaction transaction)
+        public bool CreateTransaction(models.Transaction transaction)
         {
             string query = @"INSERT INTO client_transaction (transaction_id, order_date, amount, is_delivered, client_id) 
                             VALUES (@TransactionId, @OrderDate, @Amount, @IsDelivered, @ClientId)";
@@ -56,6 +57,83 @@ namespace Cook_Eat.services
 
             var result = _databaseService.ExecuteQuery(query);
             return result[0];
+        }
+
+        public List<Dictionary<string, object>> GetClientTransactions(int id)
+        {
+            string query = $@"
+                SELECT 
+                    transaction_id as 'ID',
+                    order_date as 'DATE',
+                    amount as 'MONTANT',
+                    is_delivered as 'STATUT'
+                FROM client_transaction
+                WHERE client_id = {id}"
+            ;
+
+            var result = _databaseService.ExecuteQuery(query);
+            return result;
+        }
+
+        public List<Dictionary<string,object>> GetPreparationAmount(int id)
+        {
+            string query = $@"
+                SELECT
+                    price
+                FROM dish_preparation
+                WHERE preparation_id = {id}"
+            ;
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public bool AddTransactionAmount(int tId, double amount)
+        {
+            string query = $@"UPDATE client_transaction SET amount = amount + {amount} WHERE transaction_id = {tId}";
+
+            return _databaseService.ExecuteNonQuery(query);
+        }
+
+        public List<Dictionary<string, object>> GetClientOrders(int id)
+        {
+            string query = $@"
+                SELECT 
+                    p.preparation_id as 'ID',
+                    DATE_FORMAT(p.preparation_date, '%d/%m/%Y %H:%i') AS 'Date préparation',
+                    DATE_FORMAT(p.peremption_date, '%d/%m/%Y %H:%i') AS 'Date péremption',
+                    p.price AS 'Prix',
+                    p.number_of_person AS 'Portions',
+                    is_published as 'STATUT'
+                FROM dish_preparation p
+                JOIN client_order c ON c.preparation_id = p.preparation_id
+                JOIN client_transaction t ON t.transaction_id = c.transaction_id
+                WHERE t.client_id = {id}"
+            ;
+
+            var result = _databaseService.ExecuteQuery(query);
+            return result;
+        }
+
+        public List<Dictionary<string,object>> GetCookOrders(int id)
+        {
+            string query = $@"
+                SELECT 
+                    p.preparation_id as 'ID Préparation',
+                    d.dish_name as 'Nom du plat',
+                    DATE_FORMAT(p.preparation_date, '%d/%m/%Y %H:%i') AS 'Date préparation',
+                    DATE_FORMAT(p.peremption_date, '%d/%m/%Y %H:%i') AS 'Date péremption',
+                    p.price AS 'Prix',
+                    p.number_of_person AS 'Portions',
+                    is_published as 'STATUT',
+                    c.address_id as 'ID Adresse'
+                FROM dish_preparation p
+                JOIN client_order c ON c.preparation_id = p.preparation_id
+                JOIN dish d ON p.dish_id = d.dish_id
+                WHERE d.cook_id = {id}"
+            ;
+
+            var result = _databaseService.ExecuteQuery(query);
+            return result;
         }
 
         public decimal CalculateOrderPrice(int orderId)
@@ -124,6 +202,13 @@ namespace Cook_Eat.services
             return $"Trajet généré entre {cookStation} (cuisinier) et {clientStation} (client)";
         }
 
+        public string SimulateDeliveryPathWithAddresses(string a1, string a2)
+        {
+            Tools.GenererTrajetParNoms(a1, a2, true);
+
+            return $"Trajet généré entre {a1} (cuisinier) et {a2} (client)";
+        }
+
         // Méthodes auxiliaires
         private int GetCookAddressIdFromOrder(int orderId)
         {
@@ -157,7 +242,7 @@ namespace Cook_Eat.services
             return result.Count > 0 ? Convert.ToInt32(result[0]["address_id"]) : 0;
         }
 
-        private string GetNearestMetroStation(int addressId)
+        public string GetNearestMetroStation(int addressId)
         {
             string query = @"
                 SELECT nearest_metro_station 

@@ -73,70 +73,97 @@ namespace Cook_Eat.views
             return Convert.ToInt32(data[0]["ID"]);
         }
 
-        public void DisplayCook()
+        public void DisplayCook(int id = -1)
         {
-            string[] menuOptions = {
-                "Par ID client (<)",
-                "Par ID client (>)",
+            if (id == -1)
+            {
+                string[] menuOptions = {
+                "Par ID cook (<)",
+                "Par ID cook (>)",
                 "Par prénom (A-Z)",
                 "Par prénom (Z-A)",
                 "Par nom (A-Z)",
                 "Par nom (Z-A)",
-                "Par ...",
-                "Par ...",
                 "Retour"
-            };
+                };
 
-            while (true)
-            {
-                Console.Clear();
-                int choice = ConsoleView.ShowMenu("AFFICHAGE CUISINIERS", menuOptions);
-
-                List<Dictionary<string, object>> data;
-                string title;
-
-                switch (choice)
+                while (true)
                 {
-                    case 0:
-                        data = _cookService.GetCookSorted("c.cook_id", true);
-                        title = "CLIENTS PAR ID (<)";
-                        break;
-                    case 1:
-                        data = _cookService.GetCookSorted("c.cook_id", false);
-                        title = "CLIENTS PAR ID (>)";
-                        break;
-                    case 2:
-                        data = _cookService.GetCookSorted("u.first_name", true);
-                        title = "CLIENTS PAR PRENOM (A-Z)";
-                        break;
-                    case 3:
-                        data = _cookService.GetCookSorted("u.first_name", false);
-                        title = "CLIENTS PAR PRENOM (Z-A)";
-                        break;
-                    case 4:
-                        data = _cookService.GetCookSorted("u.last_name", true);
-                        title = "CLIENTS PAR NOM (A-Z)";
-                        break;
-                    case 5:
-                        data = _cookService.GetCookSorted("u.last_name", false);
-                        title = "CLIENTS PAR NOM (Z-A)";
-                        break;
-                    case 8:
-                        return;
-                    default:
-                        continue;
+                    Console.Clear();
+                    int choice = ConsoleView.ShowMenu("AFFICHAGE CUISINIERS", menuOptions);
+
+                    List<Dictionary<string, object>> data;
+                    string title;
+
+                    switch (choice)
+                    {
+                        case 0:
+                            data = _cookService.GetCookSorted("c.cook_id", true);
+                            title = "CLIENTS PAR ID (<)";
+                            break;
+                        case 1:
+                            data = _cookService.GetCookSorted("c.cook_id", false);
+                            title = "CLIENTS PAR ID (>)";
+                            break;
+                        case 2:
+                            data = _cookService.GetCookSorted("u.first_name", true);
+                            title = "CLIENTS PAR PRENOM (A-Z)";
+                            break;
+                        case 3:
+                            data = _cookService.GetCookSorted("u.first_name", false);
+                            title = "CLIENTS PAR PRENOM (Z-A)";
+                            break;
+                        case 4:
+                            data = _cookService.GetCookSorted("u.last_name", true);
+                            title = "CLIENTS PAR NOM (A-Z)";
+                            break;
+                        case 5:
+                            data = _cookService.GetCookSorted("u.last_name", false);
+                            title = "CLIENTS PAR NOM (Z-A)";
+                            break;
+                        case 6:
+                            return;
+                        default:
+                            continue;
+                    }
+                    ConsoleView.DisplayDataWithChoice(data, title);
                 }
-                ConsoleView.DisplayDataWithChoice(data, title);
-                ConsoleView.WaitForContinue();
             }
+            else
+            {
+                List<Dictionary<string, object>> data = _cookService.GetCook(id);
+                ConsoleView.ShowMenuTitle("MON PROFIL CUISINIER");
+                ConsoleView.DisplayTable(data);
+            }
+        }
+
+        public void AddFavoriteCook(int id)
+        {
+            ConsoleView.ShowMenuTitle("AJOUT D'UN CUISINIER FAVORI");
+
+            string cookName = ConsoleView.GetUserInput("Entrez le pseudo du cuisinier à ajouter : ");
+            List<Dictionary<string,object>> data = _cookService.GetCookIdWithName(cookName);
+            Console.WriteLine();
+
+            if (data != null && data.Count != 0)
+            {
+                if (_cookService.AddFavoriteCook(id, Convert.ToInt32(data[0]["cook_id"])))
+                {
+                    ConsoleView.DisplayMessage("Cuisinier ajouté avec succès !");
+                }
+                else
+                {
+                    ConsoleView.DisplayMessage("Échec de l'ajout.");
+                }
+            }
+            else ConsoleView.DisplayMessage("Pseudo du cuisinier invalide.");
         }
 
         public void DisplayFavoriteCook(int id)
         {
             List<Dictionary<string, object>> data = _cookService.GetFavoriteCook(id);
-            string title = "CUISINIERS FAVORIS DU CLIENT D'ID "+id;
-            ConsoleView.DisplayDataWithChoice(data, title);
-            ConsoleView.WaitForContinue();
+            ConsoleView.ShowMenuTitle("MES CUISINIERS FAVORIS");
+            ConsoleView.DisplayTable(data);
         }
 
         public void DisplayCookDishes(int id)
@@ -144,7 +171,6 @@ namespace Cook_Eat.views
             List<Dictionary<string, object>> data = _cookService.GetFavoriteCook(id);
             string title = "CUISINIERS FAVORIS DU CLIENT D'ID " + id;
             ConsoleView.DisplayDataWithChoice(data, title);
-            ConsoleView.WaitForContinue();
         }
 
         public void ShowClientsServed()
@@ -186,51 +212,21 @@ namespace Cook_Eat.views
             }
         }
 
-        public void ShowDishesWithFrequency()
+        public void UpdateCook(int id = -1)
         {
             try
             {
-                int cookId = int.Parse(ConsoleView.GetUserInput("ID du cuisinier : "));
-                var dishes = _cookService.GetDishesWithFrequency(cookId);
-                ConsoleView.DisplayDataWithChoice(dishes, $"PLATS ET VENTE - CUISINIER #{cookId}");
-            }
-            catch (FormatException)
-            {
-                ConsoleView.DisplayMessage("ID invalide.");
-            }
-        }
+                int cookId;
+                if (id == -1) { ConsoleView.ShowMenuTitle("MODIFICATION D'UN PROFIL CUISINIER"); cookId = int.Parse(ConsoleView.GetUserInput("ID cuisinier à modifier : ")); }
+                else { ConsoleView.ShowMenuTitle("MODIFICATION DU PROFIL CUISINIER"); cookId = id; }
 
-        public void ShowTodaysDishes()
-        {
-            try
-            {
-                int cookId = int.Parse(ConsoleView.GetUserInput("ID du cuisinier : "));
-                var dishes = _cookService.GetTodaysDishes(cookId);
+                string newUsername = ConsoleView.GetUserInput("Nouveau pseudo : ");
 
-                if (dishes.Count == 0)
-                {
-                    ConsoleView.DisplayMessage("Aucun plat du jour trouvé.");
-                    return;
-                }
-
-                ConsoleView.DisplayDataWithChoice(dishes, $"PLATS DU JOUR - CUISINIER #{cookId}");
-            }
-            catch (FormatException)
-            {
-                ConsoleView.DisplayMessage("ID invalide.");
-            }
-        }
-
-        public void UpdateCook()
-        {
-            try
-            {
-                int cookId = int.Parse(ConsoleView.GetUserInput("ID cuisinier à modifier : "));
-                string newUsername = ConsoleView.GetUserInput("Nouveau nom d'utilisateur : ");
+                Console.WriteLine();
 
                 if (_cookService.UpdateCook(cookId, newUsername))
                 {
-                    ConsoleView.DisplayMessage("Nom d'utilisateur cuisinier mis à jour !");
+                    ConsoleView.DisplayMessage("Pseudo du profil cuisinier mis à jour !");
                 }
                 else
                 {

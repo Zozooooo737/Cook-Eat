@@ -29,14 +29,10 @@ namespace Cook_Eat.services
         {
             string query = $@"
                 SELECT 
-                    c.client_id as 'ID',
-                    u.user_id as 'User ID',
-                    u.first_name as 'Prénom',
-                    u.last_name as 'Nom',
-                    u.email as 'Email'
-                FROM client c
-                JOIN user_account u ON c.user_id = u.user_id
-                WHERE c.client_id = {id}";
+                    client_id as 'ID',
+                    client_username as 'PSEUDO'
+                FROM client
+                WHERE client_id = {id}";
 
             return _databaseService.ExecuteQuery(query);
         }
@@ -89,6 +85,20 @@ namespace Cook_Eat.services
                 LEFT JOIN client_transaction t ON c.client_id = t.client_id
                 GROUP BY c.client_id
                 ORDER BY SUM(t.amount) DESC";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public List<Dictionary<string,object>> GetClientAddresses(int id)
+        {
+            string query = $@"
+                SELECT 
+                    CONCAT(street_number, ' ', street_address, ', ',postcode, ' ',city) AS 'Adresse',
+                    a.address_id as 'ID'
+                FROM address a
+                JOIN user_account u ON a.user_id = u.user_id
+                JOIN client c ON u.client_id = c.client_id
+                WHERE c.client_id = {id}";
 
             return _databaseService.ExecuteQuery(query);
         }

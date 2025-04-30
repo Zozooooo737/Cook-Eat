@@ -7,6 +7,16 @@ namespace Cook_Eat
 {
     public class Tools
     {
+        public static Graph<Station> InitializeTransportNetwork()
+        {
+            Graph<Station> metroNetwork = new Graph<Station>(true, true);
+            List<Node<Station>> nodes = ReadFileToCreateStationNodes("../../../data/detailedStations.txt");
+            metroNetwork.FromAdjacencyMatrixWithNodes(ReadFileForNetworkAdjacencyMatrix("../../../data/network.txt", nodes), nodes);
+
+            return metroNetwork;
+        }
+
+
         /// <summary>
         /// Méthode pour la création du réseau de métros.
         /// </summary>
@@ -24,7 +34,6 @@ namespace Cook_Eat
             int target = int.Parse(ConsoleView.GetUserInput("ID du noeud d'arrivée : "));
             PathTest(TransportNetwork, source, target, model);
         }
-
 
 
         /// <summary>

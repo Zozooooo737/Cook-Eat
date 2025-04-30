@@ -10,10 +10,10 @@ namespace Cook_Eat.modules
         private static readonly DishService _dishService = new DishService(Program.DatabaseService);
         private static readonly OrderView _orderView = new OrderView(_orderService, _clientService, _dishService);
 
-        public static void Show(int index = 0, int id = -1)
+        public static void Show(int mode = 0, int id = -1)
         {
             string[] menuOptions = null;
-            if (index == 0)
+            if (mode == 0)
             {
                 string[] tmp = {
                 "Créer une nouvelle commande",
@@ -24,60 +24,94 @@ namespace Cook_Eat.modules
                 };
                 menuOptions = tmp;
             }
-            if (index == 1)
+            else if (mode == 1)
             {
                 string[] tmp = {
                 "Commander un/des plat(s)",
                 "Afficher toutes mes commandes",
+                "Afficher tous les plats commandés",
+                "Afficher une commande détaillée",
+                "Retour au menu principal"
+                };
+                menuOptions = tmp;
+            }
+            else
+            {
+                string[] tmp = {
+                "Afficher toutes mes commandes",
+                "Afficher le trajet pour livrer une commande",
                 "Retour au menu principal"
                 };
                 menuOptions = tmp;
             }
 
-            while (true)
-            {
-                Console.Clear();
-
-                int choice = ConsoleView.ShowMenu("MODULE COMMANDES", menuOptions);
-
-                Console.Clear();
-
-                if (index == 0)
+                while (true)
                 {
-                    switch (choice)
+                    Console.Clear();
+
+                    int choice;
+                    if (mode == 0) choice = ConsoleView.ShowMenu("MODULE COMMANDES", menuOptions);
+                    else choice = ConsoleView.ShowMenu("MES COMMANDES", menuOptions);
+
+                    Console.Clear();
+
+                    if (mode == 0)
                     {
-                        case 0:
-                            _orderView.CreateOrder();
-                            break;
-                        case 1:
-                            _orderView.ShowOrderPrice();
-                            break;
-                        case 2:
-                            _orderView.ShowDeliveryPath();
-                            break;
-                        case 3:
-                            _orderView.SimulateMetroPath();
-                            break;
-                        case 4:
-                            return;
+                        switch (choice)
+                        {
+                            case 0:
+                                _orderView.CreateOrder();
+                                break;
+                            case 1:
+                                _orderView.ShowOrderPrice();
+                                break;
+                            case 2:
+                                _orderView.ShowDeliveryPath();
+                                break;
+                            case 3:
+                                _orderView.SimulateMetroPath();
+                                break;
+                            case 4:
+                                return;
+                        }
                     }
-                }
-                if(index == 1)
-                {
-                    switch (choice)
+                    else if (mode == 1)
                     {
-                        case 0:
-                            _orderView.CreateOrder(id);
-                            break;
-                        case 1:
-                            //_orderView.ShowOrders(id);
-                            break;
-                        case 2:
-                            return;
+                        switch (choice)
+                        {
+                            case 0:
+                                _orderView.CreateOrder(id);
+                                break;
+                            case 1:
+                                _orderView.GetClientTransactions(id);
+                                break;
+                            case 2:
+                                _orderView.GetClientOrders(id);
+                                break;
+                            case 3:
+                                ConsoleView.Maintenance();
+                                //orderView.GetClientDetailedOrder(id);
+                                break;
+                            case 4:
+                                return;
+                        }
                     }
+                    else
+                    {
+                        switch (choice)
+                        {
+                            case 0:
+                                _orderView.GetCookOrders(id);
+                                break;
+                            case 1:
+                                _orderView.ShowCookDeliveryPath();
+                                break;
+                            case 2:
+                                return;
+                        }
                 }
-                ConsoleView.WaitForContinue();
-            }
+                    ConsoleView.WaitForContinue();
+                }
         }
     }
 }

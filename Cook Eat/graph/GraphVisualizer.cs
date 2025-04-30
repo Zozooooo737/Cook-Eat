@@ -62,7 +62,7 @@ namespace Cook_Eat
         /// <summary>
         /// Dictionnaire stockant la longitude et la latitude des stations.
         /// </summary>
-        Dictionary<int, (double, double)> pos = Graph<int>.ReadFileToHaveNodesPosition("../../../data/pos.txt");
+        Dictionary<int, (double, double)> pos;
 
 
 
@@ -82,6 +82,10 @@ namespace Cook_Eat
             this.useRegularPositioning = useRegularPositioning;
             this.useMetroPositioning = useMetroPositioning;
             this.useHorizontalPositioning = useHorizontalPositioning;
+
+            List<Node<Station>> nodes = Tools.ReadFileToCreateStationNodes("../../../data/detailedStations.txt");
+            pos = [];
+            foreach(Node<Station> element in nodes) { pos[element.Id] = (element.Entity.Position.Item1, element.Entity.Position.Item2); }
 
             bitmap = new Bitmap(this.width,this.height);
             graphics = Graphics.FromImage(bitmap);

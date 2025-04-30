@@ -15,12 +15,11 @@ namespace Cook_Eat.interfaces
         public static void Show()
         {
             string[] clientMenuOptions = {
-                "Module Utilisateur",
-                "Module Client",
-                "Module Cuisiniers",
-                "Module Plats",
-                "Module Commandes",
-                "Module Statistiques",
+                "Gérer mon profil Client",
+                "Les Cuisiniers",
+                "Les Plats",
+                "Mes Commandes",
+                "Mes Statistiques",
                 "Quitter le profil"
             };
 
@@ -28,29 +27,26 @@ namespace Cook_Eat.interfaces
             {
                 Console.Clear();
 
-                int choice = ConsoleView.ShowMenu("MENU CLIENT", clientMenuOptions);
+                int choice = ConsoleView.ShowMenu("MON COMPTE CLIENT", clientMenuOptions);
 
                 switch (choice)
                 {
                     case 0:
-                        UserModule.Show(1,currentId);
+                        ClientModule.Show(false, currentId);
                         break;
                     case 1:
-                        ClientModule.Show(1,currentId);
+                        CookModule.Show(1, currentId);
                         break;
                     case 2:
-                        CookModule.Show(1,currentId);
-                        break;
-                    case 3:
                         DishModule.Show(1);
                         break;
+                    case 3:
+                        OrderModule.Show(1, currentId);
+                        break;
                     case 4:
-                        OrderModule.Show();
+                        StatsModule.Show(1, currentId);
                         break;
                     case 5:
-                        StatsModule.Show();
-                        break;
-                    case 6:
                         Console.WriteLine("\nMerci d'avoir utilisé Cook'Eat. À bientôt !");
                         return;
                 }

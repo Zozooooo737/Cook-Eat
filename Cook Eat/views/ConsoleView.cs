@@ -1,4 +1,6 @@
-﻿namespace Cook_Eat.views
+﻿using Cook_Eat.services;
+
+namespace Cook_Eat.views
 {
     public class ConsoleView
     {
@@ -210,10 +212,7 @@
 
             Console.Clear();
             string[] options = new[] { "Affichage tableau complet", "Affichage paginé (un par un)", "Retour" };
-            int choice = ShowMenu($"=== {title} ===", options);
-
-            Console.Clear();
-            Console.WriteLine($"=== {title} ===");
+            int choice = ShowMenu(title, options);
 
             switch (choice)
             {
@@ -233,6 +232,90 @@
             Console.WriteLine("\nAppuyez sur une touche pour continuer...");
             Console.ReadKey(true);
             Console.Clear();
+        }
+
+        public static void Maintenance()
+        {
+            ConsoleView.DisplayMessage("Fonction indisponible pour le moment...");
+            ConsoleView.WaitForContinue();
+        }
+
+        public static int DataChoice(List<Dictionary<string,object>> data, string param1, string param2, string title)
+        {
+            if (data != null && data.Count != 0)
+            {
+                string[] menuOptions = new string[data.Count];
+                int[] ids = new int[data.Count];
+                for (int i = 0; i < data.Count; i++)
+                {
+                    menuOptions[i] = Convert.ToString(data[i][param1]);
+                    ids[i] = Convert.ToInt32(data[i][param2]);
+                }
+
+                int choice = ConsoleView.ShowMenu(title, menuOptions);
+                return ids[choice];
+            }
+            else return -1;
+        }
+
+        public static int DataPaginatedChoice(List<Dictionary<string, object>> data, string param1, string param2, string title)
+        {
+            if (data == null || data.Count == 0)
+            {
+                Console.WriteLine("Aucune donnée à afficher.");
+                return -1;
+            }
+
+            var prev = new Dictionary<string, object>
+            {
+                { param1, "<- Précédent" },
+                { param2, -1 }
+            };
+
+            var next = new Dictionary<string, object>
+            {
+                { param1, "Suivant ->" },
+                { param2, -2 }
+            };
+
+            int currentIndex = 0;
+            const int pageSize = 5;
+            int choice;
+
+            do
+            {
+                Console.Clear();
+
+                var currentPage = new List<Dictionary<string, object>>();
+                if (currentIndex > 0)
+                {
+                    currentPage.Add(prev);
+                }
+
+                for (int i = 0; i < pageSize && (currentIndex + i) < data.Count; i++)
+                {
+                    currentPage.Add(data[currentIndex + i]);
+                }
+
+                if (currentIndex + pageSize < data.Count)
+                {
+                    currentPage.Add(next);
+                }
+
+                choice = DataChoice(currentPage, param1, param2, title);
+
+                if (choice == -1 && currentIndex >= pageSize)
+                {
+                    currentIndex -= pageSize;
+                }
+                else if (choice == -2 && currentIndex + pageSize < data.Count)
+                {
+                    currentIndex += pageSize;
+                }
+
+            } while (choice == -1 || choice == -2);
+
+            return choice;
         }
     }
 }

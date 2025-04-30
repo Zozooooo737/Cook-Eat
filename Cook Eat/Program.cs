@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using Cook_Eat.views;
+using Cook_Eat.graph;
+using Cook_Eat.models;
 
 namespace Cook_Eat
 {
@@ -23,6 +25,8 @@ namespace Cook_Eat
         {
             Console.Title = "Cook-Eat - Livraison de repas entre voisins";
             Console.ForegroundColor = ConsoleColor.White;
+
+            MainInterface.Graph = Tools.InitializeTransportNetwork();
             MainInterface.Show();
         }
     }

@@ -28,6 +28,7 @@ namespace Cook_Eat.interfaces
                 if (clientId == -1 && cookId == -1)
                 {
                     string[] tmp = {
+                    "Profil Utilisateur",
                     "Créer son profil Client",
                     "Créer son profil Cuisinier",
                     "Se déconnecter"
@@ -37,8 +38,9 @@ namespace Cook_Eat.interfaces
                 else if (clientId == -1)
                 {
                     string[] tmp = {
+                    "Profil Utilisateur",
                     "Créer son profil Client",
-                    "Profil Cuisinier",
+                    "Compte Cuisinier",
                     "Se déconnecter"
                     };
                     userMenuOptions = tmp;
@@ -46,7 +48,8 @@ namespace Cook_Eat.interfaces
                 else if (cookId == -1)
                 {
                     string[] tmp = {
-                    "Profil Client",
+                    "Profil Utilisateur",
+                    "Compte Client",
                     "Créer son profil Cuisinier",
                     "Se déconnecter"
                     };
@@ -55,8 +58,9 @@ namespace Cook_Eat.interfaces
                 else
                 {
                     string[] tmp = {
-                    "Profil Client",
-                    "Profil Cuisinier",
+                    "Profil Utilisateur",
+                    "Compte Client",
+                    "Compte Cuisinier",
                     "Se déconnecter"
                     };
                     userMenuOptions = tmp;
@@ -69,14 +73,17 @@ namespace Cook_Eat.interfaces
                 switch (choice)
                 {
                     case 0:
+                        UserModule.Show(false);
+                        break;
+                    case 1:
                         if (clientId != -1) { ClientInterface.currentId = clientId; ClientInterface.Show(); }
                         else ClientModule.BecomeClient();
                         break;
-                    case 1:
+                    case 2:
                         if (cookId != -1) { CookInterface.currentId = cookId; CookInterface.Show(); }
                         else CookModule.BecomeCook();
                         break;
-                    case 2:
+                    case 3:
                         Console.WriteLine("\nDéconnexion réussie !");
                         return;
                 }

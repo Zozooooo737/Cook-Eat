@@ -1,5 +1,7 @@
-﻿using Cook_Eat.models;
+﻿using System.Net;
+using Cook_Eat.models;
 using MySql.Data.MySqlClient;
+using MySqlX.XDevAPI;
 
 namespace Cook_Eat.services
 {
@@ -26,6 +28,18 @@ namespace Cook_Eat.services
             return _databaseService.ExecuteNonQuery(query, parameters);
         }
 
+        public List<Dictionary<string, object>> GetCook(int id)
+        {
+            string query = $@"
+                SELECT 
+                    cook_id as 'ID',
+                    cook_username as 'PSEUDO'
+                FROM cook
+                WHERE cook_id = {id}";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
         public List<Dictionary<string, object>> GetCookSorted(string orderBy, bool ascending = true)
         {
             string direction = ascending ? "ASC" : "DESC";
@@ -33,6 +47,7 @@ namespace Cook_Eat.services
                 SELECT 
                     c.cook_id as 'ID',
                     u.user_id as 'User ID',
+                    c.cook_username as 'Pseudo',
                     u.first_name as 'Prénom',
                     u.last_name as 'Nom',
                     u.email as 'Email'
@@ -46,12 +61,28 @@ namespace Cook_Eat.services
         public List<Dictionary<string, object>> GetFavoriteCook(int id)
         {
             string query = $@"
-                SELECT 
-                    cook_id as 'ID',
-                FROM is_favorite
-                WHERE client_id = {id}";
+                SELECT
+                f.cook_id as 'ID',
+                c.cook_username as 'PSEUDO'
+                FROM is_favorite f
+                JOIN cook c ON c.cook_id = f.cook_id
+                WHERE f.client_id = {id}";
             
             return _databaseService.ExecuteQuery(query);
+        }
+
+        public List<Dictionary<string,object>> GetCookIdWithName(string name)
+        {
+            string query = $@"SELECT cook_id FROM cook WHERE cook_username = '{name}'";
+
+            return _databaseService.ExecuteQuery(query);
+        }
+
+        public bool AddFavoriteCook(int clientId, int cookId)
+        {
+            string query = $@"INSERT INTO is_favorite VALUES ({clientId},{cookId})";
+
+            return _databaseService.ExecuteNonQuery(query);
         }
 
         public List<Dictionary<string, object>> GetClientsServed(int cookId, DateTime? startDate = null, DateTime? endDate = null)
@@ -107,41 +138,6 @@ namespace Cook_Eat.services
                 JOIN dish d ON p.dish_id = d.dish_id
                 WHERE d.cook_id = @CookId
                 ORDER BY p.preparation_date DESC";
-
-            MySqlParameter[] parameters = { new MySqlParameter("@CookId", cookId) };
-
-            return _databaseService.ExecuteQuery(query, parameters);
-        }
-
-        public List<Dictionary<string, object>> GetDishesWithFrequency(int cookId)
-        {
-            string query = @"
-    SELECT 
-        d.dish_id as 'ID',
-        d.dish_name as 'Plat',
-        SUM(CASE WHEN p.is_published = FALSE THEN 1 ELSE 0 END) as 'Ventes'
-    FROM dish d
-    LEFT JOIN dish_preparation p ON d.dish_id = p.dish_id
-    WHERE d.cook_id = @CookId
-    GROUP BY d.dish_id
-    ORDER BY Ventes DESC";
-
-            MySqlParameter[] parameters = { new MySqlParameter("@CookId", cookId) };
-
-            return _databaseService.ExecuteQuery(query, parameters);
-        }
-
-        public List<Dictionary<string, object>> GetTodaysDishes(int cookId)
-        {
-            string query = @"
-                SELECT 
-                    d.dish_name as 'Plat du jour',
-                    p.price as 'Prix',
-                    p.number_of_person as 'Pour'
-                FROM dish_preparation p
-                JOIN dish d ON p.dish_id = d.dish_id
-                WHERE d.cook_id = @CookId 
-                AND p.is_published = TRUE";
 
             MySqlParameter[] parameters = { new MySqlParameter("@CookId", cookId) };
 

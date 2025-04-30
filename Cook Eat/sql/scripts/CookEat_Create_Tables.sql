@@ -126,3 +126,33 @@ CREATE TABLE is_favorite(
 SELECT user_id FROM user_account WHERE password = 'hugo';
 
 SELECT client_id FROM client WHERE user_id = 51;
+
+
+SELECT cook_id as 'ID' FROM is_favorite WHERE client_id = 1;
+
+SELECT cook_username FROM cook;	
+
+SELECT 
+    client_id as 'ID',
+    client_username as 'PSEUDO'
+WHERE client_id = 37;
+
+INSERT INTO address (street_number, street_address, city, postcode, nearest_metro_station, user_id)
+                           VALUES ( 16,
+                                    's',
+                                    'r',
+                                    '1',
+                                    'd',
+                                    51);
+                                    
+
+SELECT CONCAT(street_number, ' ', street_address, ', ',postcode, ' ',city) AS 'Adresse' 
+FROM address WHERE user_id = 37 ORDER BY address_id DESC;
+
+DELETE FROM address WHERE user_id = 37;
+
+INSERT INTO client_order (order_date, transaction_id, address_id, preparation_id) 
+VALUES ("2025-04-30 03:49:12", 31, 20, 10);
+
+SELECT * FROM client_order JOIN client_transaction ON client_order.transaction_id = client_transaction.transaction_id
+WHERE client_id = 37;

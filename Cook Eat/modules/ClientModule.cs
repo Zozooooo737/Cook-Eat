@@ -9,10 +9,10 @@ namespace Cook_Eat.modules
         private static readonly ClientService _clientService = new ClientService(Program.DatabaseService);
         private static readonly ClientView _clientView = new ClientView(_clientService);
 
-        public static void Show(int index = 0, int id = -1)
+        public static void Show(bool adminMode = true, int id = -1)
         {
             string[] menuOptions = null;
-            if (index == 0)
+            if (adminMode)
             {
                 string[] tmp = {
                 "Créer un compte client",
@@ -23,7 +23,7 @@ namespace Cook_Eat.modules
                 };
                 menuOptions = tmp;
             }
-            if (index == 1)
+            else
             {
                 string[] tmp = {
                 "Afficher mes infos",
@@ -37,11 +37,13 @@ namespace Cook_Eat.modules
             {
                 Console.Clear();
 
-                int choice = ConsoleView.ShowMenu("MODULE CLIENTS", menuOptions);
+                int choice;
+                if(adminMode) choice = ConsoleView.ShowMenu("MODULE CLIENTS", menuOptions);
+                else choice = ConsoleView.ShowMenu("MON PROFIL CLIENT", menuOptions);
 
                 Console.Clear();
 
-                if (index == 0)
+                if (adminMode)
                 {
                     switch (choice)
                     {
@@ -61,7 +63,7 @@ namespace Cook_Eat.modules
                             return;
                     }
                 }
-                if (index == 1)
+                else
                 {
                     switch (choice)
                     {

@@ -1,5 +1,7 @@
 ﻿using Cook_Eat.models;
 using Cook_Eat.services;
+using Cook_Eat.graph;
+using Cook_Eat.interfaces;
 
 namespace Cook_Eat.views
 {
@@ -12,15 +14,22 @@ namespace Cook_Eat.views
             _userService = userService;
         }
 
-        public int Connexion()
+        public int Connexion(int method)
         {
-            string param = ConsoleView.GetUserInput("Entrez votre id Utilisateur : ");
-            string password = ConsoleView.GetUserInput("Entrez votre mot de passe : ");
+            string param = null;
+            string password = null;
+            List<Dictionary<string, object>> data = [];
 
-            List<Dictionary<string, object>> data = _userService.Connexion(param, password);
+            param = ConsoleView.GetUserInput("Entrez votre email Utilisateur : ");
+            password = ConsoleView.GetUserInput("Entrez votre mot de passe : ");
+
+            if (method == 1) data = _userService.Connexion(1, param, password);
+            else data = _userService.Connexion(2, param, password);
+
             if (data == null) return -1;
             else return Convert.ToInt32(data[0]["user_id"]);
         }
+
         public void CreateUser()
         {
             string firstName = ConsoleView.GetUserInput("Entrez votre prénom : ");
@@ -116,15 +125,13 @@ namespace Cook_Eat.views
                             continue;
                     }
                     ConsoleView.DisplayDataWithChoice(data, title);
-                    ConsoleView.WaitForContinue();
                 }
             }
             else 
             {
                 List<Dictionary<string, object>> data = _userService.GetUser(id); ;
-                string title = "UTILISATEURS D'ID CUISINIER " + id;
-                ConsoleView.DisplayDataWithChoice(data, title);
-                ConsoleView.WaitForContinue();
+                ConsoleView.ShowMenuTitle("MON PROFIL UTILISATEUR");
+                ConsoleView.DisplayTable(data);
             }
         }
 
@@ -133,8 +140,9 @@ namespace Cook_Eat.views
             try
             {
                 int userId;
-                if (id == -1) { userId = int.Parse(ConsoleView.GetUserInput("Entrez l'ID de l'utilisateur à modifier : ")); }
-                else { userId = id; }
+                if (id == -1) { ConsoleView.ShowMenuTitle("MODIFICATION D'UN UTILISATEUR"); userId = int.Parse(ConsoleView.GetUserInput("Entrez l'ID de l'utilisateur à modifier : ")); }
+                else { ConsoleView.ShowMenuTitle("MODIFICATION DU COMPTE UTILISATEUR"); userId = id; }
+
                 var user = _userService.GetUserById(userId);
 
                 if (user == null)
@@ -187,6 +195,105 @@ namespace Cook_Eat.views
                 else
                 {
                     ConsoleView.DisplayMessage("Une erreur est survenue lors de la suppression de l'utilisateur.");
+                }
+            }
+            catch (FormatException)
+            {
+                ConsoleView.DisplayMessage("Veuillez entrer un ID valide (nombre entier).");
+            }
+        }
+
+        public void AddAddress(int id = -1)
+        {
+            try
+            {
+                ConsoleView.ShowMenuTitle("MENU CRÉATION ADRESSE");
+
+                int streetNumber = int.Parse(ConsoleView.GetUserInput("Entrez le numéro de l'adresse : "));
+                string streetAddress = ConsoleView.GetUserInput("Entrez la rue de l'adresse : ");
+                string city = ConsoleView.GetUserInput("Entrez la ville de l'adresse : ");
+                string postcode = ConsoleView.GetUserInput("Entrez le code postale de l'adresse : ");
+
+                string fullAddress = streetNumber + " " + streetAddress + ", " + postcode + " " + city;
+                string[] closestStations = StationsCalculation.SearchingClosestStations(MainInterface.Graph, fullAddress);
+
+                Console.WriteLine();
+
+                int choice = ConsoleView.ShowMenu("QUELLE EST LA STATION LA PLUS PROCHE ?", closestStations);
+                string nearestMetroStation = closestStations[choice];
+
+                int userId;
+                if (id == -1) userId = int.Parse(ConsoleView.GetUserInput("Entrez l'ID de l'utilisateur à supprimer : "));
+                else userId = id;
+
+                var address = new Address
+                {
+                    StreetNumber = streetNumber,
+                    StreetAddress = streetAddress,
+                    City = city,
+                    Postcode = postcode,
+                    NearestMetroStation = nearestMetroStation,
+                    UserId = userId
+                };
+
+                Console.WriteLine();
+
+                if (_userService.AddAddress(address))
+                {
+                    ConsoleView.DisplayMessage("Adresse ajoutée avec succès !");
+                }
+                else
+                {
+                    ConsoleView.DisplayMessage("Échec de l'ajout.");
+                }
+            }
+            catch (FormatException)
+            {
+                ConsoleView.DisplayMessage("ID Utilisateur invalide.");
+            }
+        }
+
+        public void GetAddresses(int id = -1)
+        {
+            int userId;
+            if (id == -1) userId = int.Parse(ConsoleView.GetUserInput("ID Utilisateur : "));
+            else userId = id;
+
+            List<Dictionary<string, object>> data = _userService.GetAddresses(id);
+
+            if (id == -1) ConsoleView.ShowMenuTitle("ADRESSES DE L'UTILISATEUR D'ID" + id);
+            else ConsoleView.ShowMenuTitle("MES ADRESSES");
+
+            ConsoleView.DisplayTable(data);
+        }
+
+        public void DeleteAddress(int id = -1)
+        {
+            try
+            {
+                int userId;
+                if (id == -1) userId = int.Parse(ConsoleView.GetUserInput("ID Utilisateur : "));
+                else userId = id;
+
+                List<Dictionary<string, object>> data = _userService.GetAddresses(id);
+
+                if (data != null && data.Count != 0)
+                {
+                    int addressId = ConsoleView.DataChoice(data, "Adresse", "ID", "CHOIX ADRESSE À SUPPRIMER");
+
+                    if (_userService.DeleteAddress(addressId))
+                    {
+                        ConsoleView.DisplayMessage("Adresse supprimée avec succès !");
+                    }
+                    else
+                    {
+                        ConsoleView.DisplayMessage("Échec de la suppression.");
+                    }
+                }
+                else
+                {
+                    ConsoleView.ShowMenuTitle("CHOIX ADRESSE À SUPPRIMER");
+                    ConsoleView.DisplayTable(data);
                 }
             }
             catch (FormatException)

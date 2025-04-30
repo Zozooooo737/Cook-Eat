@@ -85,7 +85,7 @@ namespace Cook_Eat.views
                 "Par adresse",
                 "Par dépenses totales",
                 "Retour"
-            };
+                };
 
                 while (true)
                 {
@@ -135,15 +135,13 @@ namespace Cook_Eat.views
                             continue;
                     }
                     ConsoleView.DisplayDataWithChoice(data, title);
-                    ConsoleView.WaitForContinue();
                 }
             }
             else
             {
                 List<Dictionary<string, object>> data = _clientService.GetClient(id);
-                string title = "CLIENT D'ID " + id;
-                ConsoleView.DisplayDataWithChoice(data, title);
-                ConsoleView.WaitForContinue();
+                ConsoleView.ShowMenuTitle("MON PROFIL CLIENT");
+                ConsoleView.DisplayTable(data);
             }
         }
 
@@ -152,13 +150,16 @@ namespace Cook_Eat.views
             try
             {
                 int clientId;
-                if (id == -1) { clientId = int.Parse(ConsoleView.GetUserInput("ID client à modifier : ")); }
-                else { clientId = id; }
-                string newUsername = ConsoleView.GetUserInput("Nouveau nom d'utilisateur : ");
+                if (id == -1) { ConsoleView.ShowMenuTitle("MODIFICATION D'UN PROFIL CLIENT"); clientId = int.Parse(ConsoleView.GetUserInput("ID client à modifier : ")); }
+                else { ConsoleView.ShowMenuTitle("MODIFICATION DU PROFIL CLIENT"); clientId = id; }
+
+                string newUsername = ConsoleView.GetUserInput("Nouveau pseudo: ");
+
+                Console.WriteLine();
 
                 if (_clientService.UpdateClient(clientId, newUsername))
                 {
-                    ConsoleView.DisplayMessage("Nom d'utilisateur client mis à jour !");
+                    ConsoleView.DisplayMessage("Pseudo du profil client mis à jour !");
                 }
                 else
                 {
